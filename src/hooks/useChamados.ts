@@ -11,7 +11,11 @@ import { LocationService } from '../services/LocationService'
 import type { Page, PageParams } from '../types/pagination'
 import { isProblemDetails, mensagemDeErro } from '../utils/problemDetails'
 
-export type DetalhesChamado = Omit<RegistrarChamadoRequest, 'localizacao'>
+/**
+ * Se `localizacao` vier preenchida (mesmo que como undefined), o hook usa esse valor
+ * em vez de consultar o GPS de novo, mantendo o que o usuário viu na tela.
+ */
+export type DetalhesChamado = RegistrarChamadoRequest
 
 // TODO: valores provisórios enquanto o back-end exigir órgão/ocorrência na emergência imediata
 const EMERGENCIA_IMEDIATA_PROVISORIO = { orgao: 'SAMU', ocorrenciaId: 1 } as const
@@ -67,10 +71,12 @@ export function useChamados() {
             ? imediata
             : !imediata &&
               envio.payload.orgao === detalhes?.orgao &&
-              envio.payload.ocorrenciaId === detalhes?.ocorrenciaId)
+              envio.payload.ocorrenciaId === detalhes?.ocorrenciaId &&
+              envio.payload.descricao === detalhes?.descricao)
 
         if (!envio || !mesmoDisparo) {
-          const localizacao = await obterLocalizacao()
+          const localizacao =
+            detalhes && 'localizacao' in detalhes ? detalhes.localizacao : await obterLocalizacao()
           setSemLocalizacao(!localizacao)
           const idempotencyKey = uuidv4()
           envio =
@@ -112,8 +118,26 @@ export function useChamados() {
     setCarregandoHistorico(true)
     setErroHistorico(null)
     try {
-      setHistorico(await ChamadosService.listarHistorico(params))
+      const pagina: unknown = await ChamadosService.listarHistorico(params)
+      // Tolera a API devolvendo uma lista simples em vez de Page<Chamado>
+      if (Array.isArray(pagina)) {
+        setHistorico({
+          content: pagina,
+          totalElements: pagina.length,
+          totalPages: 1,
+          number: 0,
+          size: pagina.length,
+          first: true,
+          last: true,
+        })
+      } else if (pagina && Array.isArray((pagina as Page<Chamado>).content)) {
+        setHistorico(pagina as Page<Chamado>)
+      } else {
+        console.error('[useChamados] Resposta inesperada do histórico:', pagina)
+        setErroHistorico('Não foi possível ler o histórico recebido do servidor.')
+      }
     } catch (err) {
+      console.error('[useChamados] Falha ao listar histórico:', err)
       setErroHistorico(mensagemDeErro(err))
     } finally {
       setCarregandoHistorico(false)

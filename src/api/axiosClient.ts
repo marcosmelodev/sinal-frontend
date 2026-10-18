@@ -32,6 +32,8 @@ axiosClient.interceptors.response.use(
         status: data.status,
         code: data.code ?? 'UNKNOWN_ERROR',
         correlationId: data.correlationId,
+        title: data.title,
+        detail: data.detail,
         errors: data.errors ?? [],
       }
       return Promise.reject(problem)

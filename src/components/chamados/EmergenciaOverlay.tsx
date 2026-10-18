@@ -3,6 +3,11 @@ import { AlertTriangle, OctagonAlert } from 'lucide-react'
 
 interface EmergenciaOverlayProps {
   aberto: boolean
+  /**
+   * true (padrão): pede confirmação antes de enviar ("ENVIAR AGORA").
+   * false: só dá feedback do envio já iniciado (enviando / erro com nova tentativa).
+   */
+  confirmacao?: boolean
   /** Nome do destino exibido na confirmação (ex.: "SAMU") */
   destino?: string
   isSubmitting: boolean
@@ -13,10 +18,11 @@ interface EmergenciaOverlayProps {
 
 /**
  * Diálogo de confirmação e envio do chamado, baseado no modal de Emergência Imediata da referência.
- * Fluxo: confirmar → enviando → (erro → tentar novamente | cancelar).
+ * Fluxo: [confirmar →] enviando → (erro → tentar novamente | cancelar).
  */
 function EmergenciaOverlay({
   aberto,
+  confirmacao = true,
   destino,
   isSubmitting,
   error,
@@ -47,9 +53,17 @@ function EmergenciaOverlay({
       >
         <OctagonAlert aria-hidden="true" className="h-11 w-11 text-red-400" />
         <h2 id="emergencia-titulo" className="text-xl font-bold">
-          Confirmar Emergência?
+          {confirmacao
+            ? 'Confirmar Emergência?'
+            : error
+              ? 'Não foi possível enviar'
+              : 'Enviando sua solicitação'}
         </h2>
-        <p id="emergencia-descricao">Você está em perigo e deseja enviar sua localização?</p>
+        <p id="emergencia-descricao">
+          {confirmacao
+            ? 'Você está em perigo e deseja enviar sua localização?'
+            : 'Aguarde enquanto enviamos seu pedido de ajuda.'}
+        </p>
         {destino && (
           <p className="text-slate-300">
             Destino: <b className="text-slate-50">{destino}</b>
@@ -80,7 +94,13 @@ function EmergenciaOverlay({
               className="h-5 w-5 animate-spin rounded-full border-[3px] border-white/30 border-t-white motion-reduce:animate-none"
             />
           )}
-          {isSubmitting ? 'Obtendo localização…' : error ? 'TENTAR NOVAMENTE' : 'ENVIAR AGORA'}
+          {isSubmitting
+            ? confirmacao
+              ? 'Obtendo localização…'
+              : 'Enviando…'
+            : error
+              ? 'TENTAR NOVAMENTE'
+              : 'ENVIAR AGORA'}
         </button>
 
         {/* Um envio em andamento não pode ser abortado, então "Cancelar" some durante o envio */}

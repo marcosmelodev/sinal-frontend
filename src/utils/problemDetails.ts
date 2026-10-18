@@ -18,10 +18,11 @@ export function mensagemDeErro(error: unknown): string {
       return 'Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.'
     case error.status === 401:
       return 'Credenciais inválidas. Verifique os dados e tente novamente.'
-    case error.status === 409:
-      return 'Já existe uma conta com esses dados.'
-    case error.status === 400 || error.status === 422:
-      return 'Verifique os dados informados.'
+    case error.status === 400 || error.status === 409 || error.status === 422:
+      // Mensagem de negócio do back-end, quando houver (ex.: ocorrência inválida para o órgão)
+      return error.detail || error.errors[0]?.mensagem || (error.status === 409
+        ? 'Já existe uma conta com esses dados.'
+        : 'Verifique os dados informados.')
     case error.status >= 500:
       return 'O servidor está com problemas. Tente novamente em instantes.'
     default:
