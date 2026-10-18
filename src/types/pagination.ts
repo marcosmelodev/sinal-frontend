@@ -1,0 +1,15 @@
+export interface PageParams {
+  page?: number
+  size?: number
+}
+
+// Formato padrão de página do Spring Data
+export interface Page<T> {
+  content: T[]
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
+  first: boolean
+  last: boolean
+}
