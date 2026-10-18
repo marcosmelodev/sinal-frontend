@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Fundo base do app = cor exata do fundo do logotipo (pixel 0,0 de assets/logo-sinal.jpg).
+ * Garante o azul-marinho mesmo antes de qualquer utilitário do Tailwind ser aplicado
+ * (e em áreas de overscroll), em vez do branco padrão do navegador.
+ */
+@layer base {
+  html,
+  body {
+    background-color: #121933;
+  }
+}

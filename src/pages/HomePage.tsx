@@ -7,10 +7,10 @@ import { EMERGENCIA_IMEDIATA, ORGAOS } from '../features/chamados/orgaos'
 import type { TipoChamado } from '../features/chamados/ChamadosService'
 import { getPerfilAtual, primeiroNome } from '../features/auth/sessao'
 import { useChamados } from '../hooks/useChamados'
-import logo from '../assets/logo.svg'
+import LogoSinal from '../components/ui/LogoSinal'
 
 const CARD_CLASSES =
-  'flex min-h-[150px] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-white/40 px-2 py-4 text-center text-white active:scale-[0.97] active:brightness-90 focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
+  'flex min-h-[150px] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-white/40 px-2 py-4 text-center text-white active:scale-[0.97] active:brightness-90 focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#121933]'
 
 function HomePage() {
   const navigate = useNavigate()
@@ -39,12 +39,9 @@ function HomePage() {
   const { Icon: IconeImediata } = EMERGENCIA_IMEDIATA
 
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-4 px-5 pb-6 pt-4">
+    <main className="mx-auto flex max-w-md flex-col gap-4 bg-[#121933] px-5 pb-6 pt-4 text-white">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xl font-extrabold tracking-[0.14em]">
-          <img src={logo} alt="" className="h-7 w-7 invert" />
-          SINAL
-        </div>
+        <LogoSinal />
         <button
           type="button"
           aria-label="Configurações"
@@ -56,7 +53,7 @@ function HomePage() {
       </div>
 
       <div>
-        <h1 className="text-[22px] font-bold">
+        <h1 className="text-[22px] font-bold text-white">
           Olá, {primeiroNome(getPerfilAtual()) ?? 'Marcos'} <span aria-hidden="true">👋</span>
         </h1>
         <p className="text-slate-300">Como podemos te ajudar?</p>
@@ -65,7 +62,7 @@ function HomePage() {
       <button
         type="button"
         onClick={handleEmergenciaGeral}
-        className="flex min-h-24 w-full flex-col items-center justify-center rounded-2xl border-[3px] border-white bg-emergencia px-4 py-3 font-bold leading-tight text-white active:scale-[0.98] active:brightness-90 focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+        className="flex min-h-24 w-full flex-col items-center justify-center rounded-2xl border-[3px] border-white bg-emergencia px-4 py-3 font-bold leading-tight text-white active:scale-[0.98] active:brightness-90 focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#121933]"
       >
         <span className="flex items-center gap-2 text-[21px]">
           <IconeImediata aria-hidden="true" className="h-8 w-8" />

@@ -9,7 +9,7 @@ function ProtectedRoute() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-[#14267A] pb-20 text-slate-50">
+      <div className="min-h-screen bg-[#121933] pb-20 text-slate-50">
         <Outlet />
       </div>
       <BottomNav />
