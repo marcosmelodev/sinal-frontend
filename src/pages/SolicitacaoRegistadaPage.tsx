@@ -45,6 +45,7 @@ function SolicitacaoRegistadaPage() {
   const orgao = chamado ? orgaoDoTipo(chamado.orgao) : null
   const tituloOcorrencia =
     doRouter?.tituloOcorrencia ??
+    chamado?.ocorrenciaNome ??
     (chamado && isTipoChamado(chamado.orgao)
       ? buscarOcorrencia(chamado.orgao, chamado.ocorrenciaId)?.titulo
       : undefined)
@@ -78,9 +79,13 @@ function SolicitacaoRegistadaPage() {
             <LinhaResumo rotulo="Ocorrência" valor={tituloOcorrencia ?? '—'} />
             <LinhaResumo
               rotulo="Localização"
-              valor={localizacao ? formatarCoordenadas(localizacao) : 'Não enviada'}
+              valor={
+                localizacao
+                  ? `${formatarCoordenadas(localizacao)}${chamado.baixaPrecisao ? ' (baixa precisão)' : ''}`
+                  : 'Enviada'
+              }
             />
-            <LinhaResumo rotulo="Horário" valor={formatarData(chamado.criadoEm)} />
+            <LinhaResumo rotulo="Horário" valor={formatarData(chamado.dataCriacao)} />
             <LinhaResumo rotulo="Código da simulação" valor={codigoSimulacao(chamado)} />
           </dl>
         </section>

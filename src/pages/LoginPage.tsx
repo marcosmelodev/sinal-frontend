@@ -5,8 +5,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import logo from '../assets/logo.svg'
-import { ACCESS_TOKEN_KEY } from '../api/axiosClient'
 import { AuthService } from '../features/auth/AuthService'
+import { iniciarSessao } from '../features/auth/sessao'
 import { loginSchema } from '../features/auth/schemas'
 import type { LoginFormData } from '../features/auth/schemas'
 import { aplicarErrosDeCampo, mensagemDeErro } from '../utils/problemDetails'
@@ -29,7 +29,7 @@ function LoginPage() {
     setErroApi(null)
     try {
       const { accessToken } = await AuthService.login(dados)
-      localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+      iniciarSessao(accessToken, dados.identificador)
       navigate('/', { replace: true })
     } catch (error) {
       if (!aplicarErrosDeCampo(error, ['identificador', 'senha'], setError)) {

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, Inbox } from 'lucide-react'
 import { buscarOcorrencia } from '../features/chamados/ocorrenciasData'
-import { isTipoChamado, orgaoDoTipo } from '../features/chamados/orgaos'
+import { EMERGENCIA_IMEDIATA, isTipoChamado, orgaoDoTipo } from '../features/chamados/orgaos'
 import { isEncerrado, tituloStatus } from '../features/chamados/status'
 import { useChamados } from '../hooks/useChamados'
 import { formatarData } from '../utils/formatters'
@@ -14,7 +14,7 @@ function HistoricoChamadosPage() {
     listarHistorico()
   }, [listarHistorico])
 
-  const chamados = historico?.content ?? []
+  const chamados = historico?.itens ?? []
 
   return (
     <main className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md flex-col">
@@ -57,11 +57,17 @@ function HistoricoChamadosPage() {
         {chamados.length > 0 && (
           <ul>
             {chamados.map((chamado) => {
-              const { nome, Icon, cor } = orgaoDoTipo(chamado.orgao)
-              const ocorrencia = isTipoChamado(chamado.orgao)
-                ? buscarOcorrencia(chamado.orgao, chamado.ocorrenciaId)
-                : undefined
-              const detalhe = ocorrencia?.titulo ?? chamado.descricao
+              const orgao = orgaoDoTipo(chamado.orgao)
+              const imediata = chamado.modalidade === 'EMERGENCIA_IMEDIATA'
+              const { Icon, cor } = orgao
+              // Nome da ocorrência vem do back-end; o catálogo local é só fallback
+              const nomeOcorrencia =
+                chamado.ocorrenciaNome ??
+                (isTipoChamado(chamado.orgao)
+                  ? buscarOcorrencia(chamado.orgao, chamado.ocorrenciaId)?.titulo
+                  : undefined)
+              const nome = imediata ? EMERGENCIA_IMEDIATA.nome : orgao.nome
+              const detalhe = imediata ? orgao.nomeCompleto : nomeOcorrencia
               return (
                 <li key={chamado.id} className="border-b border-slate-200">
                   <Link
@@ -76,15 +82,15 @@ function HistoricoChamadosPage() {
                       <b className="block">{nome}</b>
                       {detalhe && <small className="block text-sm text-slate-600">{detalhe}</small>}
                       <small className="block text-sm text-slate-600">
-                        {formatarData(chamado.criadoEm)}
+                        {formatarData(chamado.dataCriacao)}
                       </small>
                     </span>
                     <span
                       className={`ml-auto max-w-[45%] text-right text-sm font-semibold ${
-                        isEncerrado(chamado.status) ? 'text-neutro' : 'text-primario'
+                        isEncerrado(chamado.estado) ? 'text-neutro' : 'text-primario'
                       }`}
                     >
-                      {tituloStatus(chamado.status)}
+                      {tituloStatus(chamado.estado)}
                       <span className="mt-0.5 block text-primario">Ver acompanhamento ›</span>
                     </span>
                   </Link>
@@ -92,6 +98,18 @@ function HistoricoChamadosPage() {
               )
             })}
           </ul>
+        )}
+
+        {historico?.proximoCursor && (
+          <button
+            type="button"
+            onClick={() => listarHistorico(historico.proximoCursor ?? undefined)}
+            disabled={carregandoHistorico}
+            aria-busy={carregandoHistorico}
+            className="min-h-12 rounded-xl border-2 border-primario px-4 font-semibold text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primario disabled:opacity-50"
+          >
+            {carregandoHistorico ? 'Carregando…' : 'Carregar mais'}
+          </button>
         )}
       </section>
     </main>

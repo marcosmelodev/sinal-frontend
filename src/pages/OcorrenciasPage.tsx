@@ -1,9 +1,9 @@
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import OrgaoHeader from '../components/chamados/OrgaoHeader'
 import { ICONES } from '../features/chamados/icones'
-import { OCORRENCIAS, OCORRENCIA_OUTRO } from '../features/chamados/ocorrenciasData'
 import type { Ocorrencia } from '../features/chamados/ocorrenciasData'
 import { ORGAOS, isTipoChamado } from '../features/chamados/orgaos'
+import { useOcorrencias } from '../hooks/useOcorrencias'
 import type { ResumoChamadoState } from './ResumoChamadoPage'
 
 const ITEM_CLASSES =
@@ -12,11 +12,11 @@ const ITEM_CLASSES =
 function OcorrenciasPage() {
   const { orgaoId } = useParams()
   const navigate = useNavigate()
+  const catalogo = useOcorrencias(isTipoChamado(orgaoId) ? orgaoId : null)
 
   if (!isTipoChamado(orgaoId)) return <Navigate to="/" replace />
 
   const orgao = ORGAOS[orgaoId]
-  const outro = OCORRENCIA_OUTRO[orgaoId]
 
   function selecionar(ocorrencia: Ocorrencia) {
     if (!isTipoChamado(orgaoId)) return
@@ -44,28 +44,42 @@ function OcorrenciasPage() {
       <section className="relative -mt-6 flex flex-1 flex-col gap-4 rounded-t-[28px] bg-white px-5 pb-7 pt-6 text-slate-900">
         <h2 className="text-xl font-bold">O que está acontecendo?</h2>
 
-        <div className="grid grid-cols-2 gap-4">
-          {OCORRENCIAS[orgaoId].map((ocorrencia) => (
-            <button
-              key={ocorrencia.id}
-              type="button"
-              onClick={() => selecionar(ocorrencia)}
-              className={`${ITEM_CLASSES} ${orgao.borda} min-h-[88px] flex-col items-start`}
-            >
-              {renderIcone(ocorrencia, orgao.cor)}
-              {ocorrencia.titulo}
-            </button>
-          ))}
+        {!catalogo && (
+          <p role="status" className="flex items-center gap-2 text-slate-600">
+            <span
+              aria-hidden="true"
+              className="h-5 w-5 animate-spin rounded-full border-[3px] border-slate-400 border-t-slate-900 motion-reduce:animate-none"
+            />
+            Carregando ocorrências…
+          </p>
+        )}
 
-          <button
-            type="button"
-            onClick={() => selecionar(outro)}
-            className={`${ITEM_CLASSES} col-span-2 min-h-16 flex-row items-center border-l-neutro`}
-          >
-            {renderIcone(outro, 'bg-neutro')}
-            {outro.titulo}
-          </button>
-        </div>
+        {catalogo && (
+          <div className="grid grid-cols-2 gap-4">
+            {catalogo.ocorrencias.map((ocorrencia) => (
+              <button
+                key={ocorrencia.id}
+                type="button"
+                onClick={() => selecionar(ocorrencia)}
+                className={`${ITEM_CLASSES} ${orgao.borda} min-h-[88px] flex-col items-start`}
+              >
+                {renderIcone(ocorrencia, orgao.cor)}
+                {ocorrencia.titulo}
+              </button>
+            ))}
+
+            {catalogo.outro && (
+              <button
+                type="button"
+                onClick={() => catalogo.outro && selecionar(catalogo.outro)}
+                className={`${ITEM_CLASSES} col-span-2 min-h-16 flex-row items-center border-l-neutro`}
+              >
+                {renderIcone(catalogo.outro, 'bg-neutro')}
+                {catalogo.outro.titulo}
+              </button>
+            )}
+          </div>
+        )}
       </section>
     </main>
   )

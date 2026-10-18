@@ -31,7 +31,7 @@ function AcompanhamentoChamadoPage() {
   // Erros 4xx (ex.: chamado inexistente) não se resolvem sozinhos: param o polling
   const [falhaDefinitiva, setFalhaDefinitiva] = useState(false)
 
-  const encerrado = chamado ? isEncerrado(chamado.status) : false
+  const encerrado = chamado ? isEncerrado(chamado.estado) : false
 
   useEffect(() => {
     if (id === null || encerrado || falhaDefinitiva) return
@@ -69,12 +69,13 @@ function AcompanhamentoChamadoPage() {
 
   if (id === null) return <Navigate to="/" replace />
 
-  const indiceAtual = chamado ? indiceStatus(chamado.status) : -1
+  const indiceAtual = chamado ? indiceStatus(chamado.estado) : -1
   const orgao = chamado ? orgaoDoTipo(chamado.orgao) : null
 
   return (
     <main className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md flex-col">
-      <p className="sticky top-0 z-[5] flex items-center gap-2 border-b-[3px] border-white bg-neutro px-5 py-3 font-semibold text-white">
+      {/* Bloco em fluxo normal (não sticky/fixed) para nunca cobrir o título ou os alertas */}
+      <p className="flex items-center gap-2 border-b-[3px] border-white bg-neutro px-5 py-3 font-semibold text-white">
         <Info aria-hidden="true" className="h-6 w-6 flex-none" />
         PROTÓTIPO ACADÊMICO — Nenhuma central real foi acionada.
       </p>
@@ -104,14 +105,14 @@ function AcompanhamentoChamadoPage() {
             <section className="rounded-2xl bg-white p-4 text-slate-900">
               <h2 className="sr-only">Status</h2>
               <p className="sr-only" aria-live="polite">
-                Status atual: {tituloStatus(chamado.status)}
+                Status atual: {tituloStatus(chamado.estado)}
               </p>
               <ol className="flex flex-col gap-4">
                 {ETAPAS_STATUS.map((etapa, i) => {
                   const concluida = i < indiceAtual || (encerrado && i === indiceAtual)
                   const atual = i === indiceAtual && !encerrado
                   return (
-                    <li key={etapa.status} className="flex min-h-11 items-center gap-3 font-semibold">
+                    <li key={etapa.estado} className="flex min-h-11 items-center gap-3 font-semibold">
                       <span
                         aria-hidden="true"
                         className={`grid h-8 w-8 flex-none place-items-center rounded-full border-[3px] ${
@@ -140,8 +141,19 @@ function AcompanhamentoChamadoPage() {
             <section className="rounded-2xl bg-white p-4 text-slate-900">
               <h2 className="sr-only">Resumo</h2>
               <dl>
-                <LinhaResumo rotulo="Órgão" valor={orgao.nomeCompleto} />
-                <LinhaResumo rotulo="Localização" valor={chamado.localizacao ? 'Enviada' : 'Não enviada'} />
+                <LinhaResumo
+                  rotulo="Órgão"
+                  valor={
+                    chamado.modalidade === 'EMERGENCIA_IMEDIATA'
+                      ? `Emergência Imediata → ${orgao.nomeCompleto}`
+                      : orgao.nomeCompleto
+                  }
+                />
+                {/* Todo chamado é registrado com localização (obrigatória no back-end) */}
+                <LinhaResumo
+                  rotulo="Localização"
+                  valor={chamado.baixaPrecisao ? 'Enviada · baixa precisão' : 'Enviada'}
+                />
                 <LinhaResumo rotulo="Código da simulação" valor={codigoSimulacao(chamado)} />
               </dl>
             </section>

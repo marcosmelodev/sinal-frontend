@@ -5,6 +5,7 @@ import EmergenciaOverlay from '../components/chamados/EmergenciaOverlay'
 import CompartilharContatoOverlay from '../components/contatos/CompartilharContatoOverlay'
 import { EMERGENCIA_IMEDIATA, ORGAOS } from '../features/chamados/orgaos'
 import type { TipoChamado } from '../features/chamados/ChamadosService'
+import { getPerfilAtual, primeiroNome } from '../features/auth/sessao'
 import { useChamados } from '../hooks/useChamados'
 import logo from '../assets/logo.svg'
 
@@ -47,6 +48,7 @@ function HomePage() {
         <button
           type="button"
           aria-label="Configurações"
+          onClick={() => navigate('/perfil')}
           className="flex h-12 w-12 items-center justify-center rounded-full text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
         >
           <Settings aria-hidden="true" className="h-7 w-7" />
@@ -55,7 +57,7 @@ function HomePage() {
 
       <div>
         <h1 className="text-[22px] font-bold">
-          Olá, Marcos <span aria-hidden="true">👋</span>
+          Olá, {primeiroNome(getPerfilAtual()) ?? 'Marcos'} <span aria-hidden="true">👋</span>
         </h1>
         <p className="text-slate-300">Como podemos te ajudar?</p>
       </div>

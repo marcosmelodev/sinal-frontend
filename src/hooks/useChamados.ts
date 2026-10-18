@@ -3,12 +3,12 @@ import { v4 as uuidv4 } from 'uuid'
 import { ChamadosService } from '../features/chamados/ChamadosService'
 import type {
   Chamado,
+  PaginaHistorico,
   EmergenciaImediataPayload,
   Localizacao,
   RegistrarChamadoRequest,
 } from '../features/chamados/ChamadosService'
 import { LocationError, LocationService } from '../services/LocationService'
-import type { Page, PageParams } from '../types/pagination'
 import { isProblemDetails, mensagemDeErro } from '../utils/problemDetails'
 
 /**
@@ -112,32 +112,21 @@ export function useChamados() {
 
   const limparErro = useCallback(() => setError(null), [])
 
-  const [historico, setHistorico] = useState<Page<Chamado> | null>(null)
+  const [historico, setHistorico] = useState<PaginaHistorico | null>(null)
   const [carregandoHistorico, setCarregandoHistorico] = useState(false)
   const [erroHistorico, setErroHistorico] = useState<string | null>(null)
 
-  const listarHistorico = useCallback(async (params?: PageParams) => {
+  /** Sem cursor carrega a primeira página; com o `proximoCursor`, acrescenta a página seguinte */
+  const listarHistorico = useCallback(async (cursor?: string) => {
     setCarregandoHistorico(true)
     setErroHistorico(null)
     try {
-      const pagina: unknown = await ChamadosService.listarHistorico(params)
-      // Tolera a API devolvendo uma lista simples em vez de Page<Chamado>
-      if (Array.isArray(pagina)) {
-        setHistorico({
-          content: pagina,
-          totalElements: pagina.length,
-          totalPages: 1,
-          number: 0,
-          size: pagina.length,
-          first: true,
-          last: true,
-        })
-      } else if (pagina && Array.isArray((pagina as Page<Chamado>).content)) {
-        setHistorico(pagina as Page<Chamado>)
-      } else {
-        console.error('[useChamados] Resposta inesperada do histórico:', pagina)
-        setErroHistorico('Não foi possível ler o histórico recebido do servidor.')
-      }
+      const pagina = await ChamadosService.listarHistorico({ cursor })
+      setHistorico((atual) =>
+        cursor && atual
+          ? { itens: [...atual.itens, ...pagina.itens], proximoCursor: pagina.proximoCursor }
+          : pagina,
+      )
     } catch (err) {
       console.error('[useChamados] Falha ao listar histórico:', err)
       setErroHistorico(mensagemDeErro(err))
@@ -147,7 +136,8 @@ export function useChamados() {
   }, [])
 
   /**
-   * Busca um chamado pelo id. Não guarda estado nem trata o erro: quem chama decide
+   * Busca um chamado pelo id (via histórico, pois não há GET por id no back-end).
+   * Não guarda estado nem trata o erro: quem chama decide
    * (ex.: o polling do acompanhamento ignora falhas temporárias e para nas definitivas).
    */
   const buscarChamadoPorId = useCallback((id: number) => ChamadosService.buscarPorId(id), [])

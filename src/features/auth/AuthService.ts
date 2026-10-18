@@ -11,11 +11,22 @@ async function login(dados: LoginFormData): Promise<LoginResponse> {
   return { accessToken: data.accessToken, expiraEm: data.expiraEm }
 }
 
-async function cadastro(dados: CadastroFormData): Promise<void> {
-  await axiosClient.post('/api/v1/usuarios', {
+/** Espelho de `CadastrarUsuarioResponse.java` */
+export interface CadastroResponse {
+  id: number
+  nome: string
+  cpfMascarado: string
+  email: string
+  dataCadastro: string
+  ativo: boolean
+}
+
+async function cadastro(dados: CadastroFormData): Promise<CadastroResponse> {
+  const { data } = await axiosClient.post<CadastroResponse>('/api/v1/usuarios', {
     ...dados,
     cpf: dados.cpf.replace(/\D/g, ''),
   })
+  return data
 }
 
 export const AuthService = { login, cadastro }

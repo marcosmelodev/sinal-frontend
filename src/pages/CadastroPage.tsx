@@ -6,6 +6,7 @@ import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import logo from '../assets/logo.svg'
 import { AuthService } from '../features/auth/AuthService'
+import { salvarPerfil } from '../features/auth/sessao'
 import { cadastroSchema } from '../features/auth/schemas'
 import type { CadastroFormData } from '../features/auth/schemas'
 import { aplicarErrosDeCampo, mensagemDeErro } from '../utils/problemDetails'
@@ -24,7 +25,12 @@ function CadastroPage() {
   async function onSubmit(dados: CadastroFormData) {
     setErroApi(null)
     try {
-      await AuthService.cadastro(dados)
+      const usuario = await AuthService.cadastro(dados)
+      salvarPerfil(usuario.id, {
+        nome: usuario.nome,
+        email: usuario.email,
+        cpfMascarado: usuario.cpfMascarado,
+      })
       navigate('/login', { replace: true, state: { cadastroRealizado: true } })
     } catch (error) {
       if (!aplicarErrosDeCampo(error, ['nome', 'cpf', 'email', 'senha'], setError)) {

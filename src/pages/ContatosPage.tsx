@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AlertTriangle, LogOut, Pencil, Plus, Trash2 } from 'lucide-react'
-import { ACCESS_TOKEN_KEY } from '../api/axiosClient'
+import { AlertTriangle, ChevronLeft, Pencil, Plus, Trash2 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import ContatoForm from '../features/contatos/ContatoForm'
 import type { ContatoFormData } from '../features/contatos/schemas'
@@ -50,15 +49,18 @@ function ContatosPage() {
     if (await removerContato(id)) setRemovendoId(null)
   }
 
-  function handleLogout() {
-    localStorage.removeItem(ACCESS_TOKEN_KEY)
-    navigate('/login', { replace: true })
-  }
-
   return (
     <main className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md flex-col">
-      <header className="px-5 pb-9 pt-5 text-center">
-        <h1 className="text-[22px] font-bold">Meus Contatos de Confiança</h1>
+      <header className="flex flex-col gap-2 px-5 pb-9 pt-3">
+        <button
+          type="button"
+          onClick={() => navigate('/perfil')}
+          className="-ml-2 flex min-h-11 items-center gap-1 self-start rounded-lg px-2 font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        >
+          <ChevronLeft aria-hidden="true" className="h-6 w-6" />
+          Voltar
+        </button>
+        <h1 className="text-center text-[22px] font-bold">Meus Contatos de Confiança</h1>
       </header>
 
       <section className="relative -mt-6 flex flex-1 flex-col gap-4 rounded-t-[28px] bg-white px-5 pb-7 pt-6 text-slate-900">
@@ -204,14 +206,6 @@ function ContatosPage() {
           </ul>
         )}
 
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="mt-auto flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-emergencia px-4 font-semibold text-emergencia hover:bg-red-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-red-300"
-        >
-          <LogOut aria-hidden="true" className="h-5 w-5" />
-          Sair do Aplicativo
-        </button>
       </section>
     </main>
   )
