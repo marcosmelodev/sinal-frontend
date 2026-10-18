@@ -7,6 +7,7 @@ import type {
   Localizacao,
 } from '../features/chamados/ChamadosService'
 import { LocationService } from '../services/LocationService'
+import type { Page, PageParams } from '../types/pagination'
 import { isProblemDetails, mensagemDeErro } from '../utils/problemDetails'
 
 type DetalhesChamado = Omit<AbrirChamadoPayload, 'localizacao'>
@@ -81,5 +82,33 @@ export function useChamados() {
     [],
   )
 
-  return { dispararEmergencia, isSubmitting, error, semLocalizacao }
+  const limparErro = useCallback(() => setError(null), [])
+
+  const [historico, setHistorico] = useState<Page<Chamado> | null>(null)
+  const [carregandoHistorico, setCarregandoHistorico] = useState(false)
+  const [erroHistorico, setErroHistorico] = useState<string | null>(null)
+
+  const listarHistorico = useCallback(async (params?: PageParams) => {
+    setCarregandoHistorico(true)
+    setErroHistorico(null)
+    try {
+      setHistorico(await ChamadosService.listarHistorico(params))
+    } catch (err) {
+      setErroHistorico(mensagemDeErro(err))
+    } finally {
+      setCarregandoHistorico(false)
+    }
+  }, [])
+
+  return {
+    dispararEmergencia,
+    isSubmitting,
+    error,
+    semLocalizacao,
+    limparErro,
+    listarHistorico,
+    historico,
+    carregandoHistorico,
+    erroHistorico,
+  }
 }

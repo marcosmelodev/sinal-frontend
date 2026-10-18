@@ -7,8 +7,8 @@ export default {
       colors: {
         primario: '#3563E8',
         emergencia: '#EF4444',
-        alerta: '#F97316',
-        sucesso: '#10B981',
+        alerta: '#C2410C',
+        sucesso: '#047857',
         neutro: '#64748B',
       },
     },

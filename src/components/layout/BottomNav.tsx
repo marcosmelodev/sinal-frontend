@@ -12,21 +12,23 @@ function BottomNav() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="fixed bottom-0 w-full border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]"
+      className="fixed bottom-0 z-10 w-full border-t border-neutro bg-[#0B1226] pb-[env(safe-area-inset-bottom)]"
     >
-      <ul className="mx-auto flex max-w-md">
+      <ul className="mx-auto grid max-w-md grid-cols-3">
         {ITENS.map(({ to, label, Icon }) => (
-          <li key={to} className="flex-1">
+          <li key={to}>
             <NavLink
               to={to}
               end={to === '/'}
               className={({ isActive }) =>
-                `flex min-h-16 flex-col items-center justify-center gap-1 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primario ${
-                  isActive ? 'text-primario' : 'text-neutro'
+                `flex min-h-14 flex-col items-center justify-center gap-0.5 border-t-4 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white ${
+                  isActive
+                    ? 'border-primario font-bold text-white'
+                    : 'border-transparent text-slate-300'
                 }`
               }
             >
-              <Icon aria-hidden="true" className="h-6 w-6" />
+              <Icon aria-hidden="true" className="h-[22px] w-[22px]" />
               {label}
             </NavLink>
           </li>
