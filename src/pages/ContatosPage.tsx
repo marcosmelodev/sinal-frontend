@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { AlertTriangle, Pencil, Plus, Trash2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { AlertTriangle, LogOut, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ACCESS_TOKEN_KEY } from '../api/axiosClient'
 import Button from '../components/ui/Button'
 import ContatoForm from '../features/contatos/ContatoForm'
 import type { ContatoFormData } from '../features/contatos/schemas'
@@ -11,6 +13,7 @@ const ICON_BUTTON =
   'grid h-12 w-12 flex-none place-items-center rounded-xl border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primario focus-visible:ring-offset-1 disabled:opacity-50'
 
 function ContatosPage() {
+  const navigate = useNavigate()
   const {
     contatos,
     loading,
@@ -45,6 +48,11 @@ function ContatosPage() {
 
   async function handleRemover(id: number) {
     if (await removerContato(id)) setRemovendoId(null)
+  }
+
+  function handleLogout() {
+    localStorage.removeItem(ACCESS_TOKEN_KEY)
+    navigate('/login', { replace: true })
   }
 
   return (
@@ -195,6 +203,15 @@ function ContatosPage() {
             )}
           </ul>
         )}
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="mt-auto flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-emergencia px-4 font-semibold text-emergencia hover:bg-red-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-red-300"
+        >
+          <LogOut aria-hidden="true" className="h-5 w-5" />
+          Sair do Aplicativo
+        </button>
       </section>
     </main>
   )

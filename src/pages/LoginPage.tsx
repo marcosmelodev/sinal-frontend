@@ -45,7 +45,7 @@ function LoginPage() {
 
       {cadastroRealizado && !erroApi && (
         <p role="status" className="mb-4 rounded-md border-2 border-green-700 bg-green-50 p-3 text-lg text-green-900">
-          Cadastro realizado com sucesso! Faça login para continuar.
+          Conta criada com sucesso! Faça login.
         </p>
       )}
 
