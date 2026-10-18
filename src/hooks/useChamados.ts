@@ -2,20 +2,28 @@ import { useCallback, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { ChamadosService } from '../features/chamados/ChamadosService'
 import type {
-  AbrirChamadoPayload,
   Chamado,
+  EmergenciaImediataPayload,
   Localizacao,
+  RegistrarChamadoRequest,
 } from '../features/chamados/ChamadosService'
 import { LocationService } from '../services/LocationService'
 import type { Page, PageParams } from '../types/pagination'
 import { isProblemDetails, mensagemDeErro } from '../utils/problemDetails'
 
-type DetalhesChamado = Omit<AbrirChamadoPayload, 'localizacao'>
+export type DetalhesChamado = Omit<RegistrarChamadoRequest, 'localizacao'>
 
-interface EnvioPendente {
-  imediata: boolean
-  idempotencyKey: string
-  payload: AbrirChamadoPayload
+// TODO: valores provisórios enquanto o back-end exigir órgão/ocorrência na emergência imediata
+const EMERGENCIA_IMEDIATA_PROVISORIO = { orgao: 'SAMU', ocorrenciaId: 1 } as const
+
+type EnvioPendente = { idempotencyKey: string } & (
+  | { imediata: true; payload: EmergenciaImediataPayload }
+  | { imediata: false; payload: RegistrarChamadoRequest }
+)
+
+interface DispararEmergencia {
+  (imediata: true): Promise<Chamado | null>
+  (imediata: false, detalhes: DetalhesChamado): Promise<Chamado | null>
 }
 
 /**
@@ -54,19 +62,29 @@ export function useChamados() {
       try {
         let envio = pendente.current
         const mesmoDisparo =
-          envio?.imediata === imediata && (imediata || envio.payload.tipo === detalhes?.tipo)
+          envio !== null &&
+          (envio.imediata
+            ? imediata
+            : !imediata &&
+              envio.payload.orgao === detalhes?.orgao &&
+              envio.payload.ocorrenciaId === detalhes?.ocorrenciaId)
+
         if (!envio || !mesmoDisparo) {
           const localizacao = await obterLocalizacao()
           setSemLocalizacao(!localizacao)
-          envio = {
-            imediata,
-            idempotencyKey: uuidv4(),
-            payload: imediata ? { localizacao } : { ...detalhes, localizacao },
-          }
+          const idempotencyKey = uuidv4()
+          envio =
+            imediata || !detalhes
+              ? {
+                  imediata: true,
+                  idempotencyKey,
+                  payload: { ...EMERGENCIA_IMEDIATA_PROVISORIO, localizacao },
+                }
+              : { imediata: false, idempotencyKey, payload: { ...detalhes, localizacao } }
           pendente.current = envio
         }
 
-        const chamado = imediata
+        const chamado = envio.imediata
           ? await ChamadosService.abrirEmergenciaImediata(envio.payload, envio.idempotencyKey)
           : await ChamadosService.abrirChamadoPadrao(envio.payload, envio.idempotencyKey)
 
@@ -82,7 +100,7 @@ export function useChamados() {
       }
     },
     [],
-  )
+  ) as DispararEmergencia
 
   const limparErro = useCallback(() => setError(null), [])
 

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
-import { AlertTriangle } from 'lucide-react'
-import { orgaoDoTipo } from '../features/chamados/orgaos'
+import { AlertTriangle, Inbox } from 'lucide-react'
+import { buscarOcorrencia } from '../features/chamados/ocorrenciasData'
+import { isTipoChamado, orgaoDoTipo } from '../features/chamados/orgaos'
 import { useChamados } from '../hooks/useChamados'
 
 function formatarData(iso: string): string {
@@ -50,13 +51,20 @@ function HistoricoChamadosPage() {
         )}
 
         {historico && chamados.length === 0 && (
-          <p className="text-sm text-slate-600">Nenhuma solicitação ainda.</p>
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 py-12 text-center">
+            <Inbox aria-hidden="true" className="h-20 w-20 text-slate-300" strokeWidth={1.5} />
+            <p className="text-lg font-semibold text-slate-600">Nenhuma solicitação ainda.</p>
+          </div>
         )}
 
         {chamados.length > 0 && (
           <ul>
             {chamados.map((chamado) => {
-              const { nome, Icon, cor } = orgaoDoTipo(chamado.tipo)
+              const { nome, Icon, cor } = orgaoDoTipo(chamado.orgao)
+              const ocorrencia = isTipoChamado(chamado.orgao)
+                ? buscarOcorrencia(chamado.orgao, chamado.ocorrenciaId)
+                : undefined
+              const detalhe = ocorrencia?.titulo ?? chamado.descricao
               return (
                 <li
                   key={chamado.id}
@@ -67,9 +75,7 @@ function HistoricoChamadosPage() {
                   </span>
                   <span className="min-w-0">
                     <b className="block">{nome}</b>
-                    {chamado.descricao && (
-                      <small className="block text-sm text-slate-600">{chamado.descricao}</small>
-                    )}
+                    {detalhe && <small className="block text-sm text-slate-600">{detalhe}</small>}
                     <small className="block text-sm text-slate-600">
                       {formatarData(chamado.criadoEm)}
                     </small>

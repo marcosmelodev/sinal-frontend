@@ -6,6 +6,7 @@ import HomePage from '../pages/HomePage'
 import EmergenciaPage from '../pages/EmergenciaPage'
 import HistoricoChamadosPage from '../pages/HistoricoChamadosPage'
 import ContatosPage from '../pages/ContatosPage'
+import OcorrenciasPage from '../pages/OcorrenciasPage'
 
 export function AppRoutes() {
   return (
@@ -16,6 +17,7 @@ export function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/emergencia" element={<EmergenciaPage />} />
+        <Route path="/ocorrencias/:orgaoId" element={<OcorrenciasPage />} />
         <Route path="/historico" element={<HistoricoChamadosPage />} />
         <Route path="/contatos" element={<ContatosPage />} />
       </Route>

@@ -14,21 +14,26 @@ export interface Localizacao {
 
 export interface Chamado {
   id: number
-  tipo: TipoChamado
+  orgao: TipoChamado
+  ocorrenciaId?: number
   status: string
   descricao?: string
   localizacao?: Localizacao
   criadoEm: string
 }
 
-export interface AbrirChamadoPayload {
-  tipo?: TipoChamado
+export interface RegistrarChamadoRequest {
+  orgao: TipoChamado
+  ocorrenciaId: number
   descricao?: string
   localizacao?: Localizacao
 }
 
 export interface EmergenciaImediataPayload {
   localizacao?: Localizacao
+  // TODO: remover quando o back-end deixar de exigir estes campos na emergência imediata
+  orgao?: TipoChamado
+  ocorrenciaId?: number
 }
 
 const BASE_URL = '/api/v1/chamados'
@@ -41,7 +46,7 @@ async function listarHistorico({ page, size }: PageParams = {}): Promise<Page<Ch
 }
 
 async function abrirChamadoPadrao(
-  payload: AbrirChamadoPayload,
+  payload: RegistrarChamadoRequest,
   idempotencyKey: string,
 ): Promise<Chamado> {
   const { data } = await axiosClient.post<Chamado>(BASE_URL, payload, {

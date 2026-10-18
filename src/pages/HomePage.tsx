@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Settings, Users } from 'lucide-react'
 import EmergenciaOverlay from '../components/chamados/EmergenciaOverlay'
+import CompartilharContatoOverlay from '../components/contatos/CompartilharContatoOverlay'
 import { EMERGENCIA_IMEDIATA, ORGAOS } from '../features/chamados/orgaos'
 import type { TipoChamado } from '../features/chamados/ChamadosService'
 import { useChamados } from '../hooks/useChamados'
 import logo from '../assets/logo.svg'
-
-type Disparo = { imediata: true } | { imediata: false; tipo: TipoChamado }
 
 const CARD_CLASSES =
   'flex min-h-[150px] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-white/40 px-2 py-4 text-center text-white active:scale-[0.97] active:brightness-90 focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
@@ -15,27 +14,20 @@ const CARD_CLASSES =
 function HomePage() {
   const navigate = useNavigate()
   const { dispararEmergencia, isSubmitting, error, limparErro } = useChamados()
-  // Disparo aguardando confirmação no modal
-  const [pendente, setPendente] = useState<Disparo | null>(null)
+  const [confirmandoEmergencia, setConfirmandoEmergencia] = useState(false)
+  const [compartilhando, setCompartilhando] = useState(false)
 
   function handleEmergenciaGeral() {
-    setPendente({ imediata: true })
-  }
-
-  function handleChamadoPadrao(tipo: TipoChamado) {
-    setPendente({ imediata: false, tipo })
+    setConfirmandoEmergencia(true)
   }
 
   async function handleConfirmar() {
-    if (!pendente) return
-    const chamado = pendente.imediata
-      ? await dispararEmergencia(true)
-      : await dispararEmergencia(false, { tipo: pendente.tipo })
+    const chamado = await dispararEmergencia(true)
     if (chamado) navigate('/historico')
   }
 
   function handleCancelar() {
-    setPendente(null)
+    setConfirmandoEmergencia(false)
     limparErro()
   }
 
@@ -83,7 +75,7 @@ function HomePage() {
             <button
               key={tipo}
               type="button"
-              onClick={() => handleChamadoPadrao(tipo)}
+              onClick={() => navigate(`/ocorrencias/${tipo}`)}
               className={`${CARD_CLASSES} ${cor}`}
             >
               <Icon aria-hidden="true" className="h-11 w-11" />
@@ -95,7 +87,7 @@ function HomePage() {
 
         <button
           type="button"
-          onClick={() => navigate('/contatos')}
+          onClick={() => setCompartilhando(true)}
           className={`${CARD_CLASSES} bg-sucesso`}
         >
           <Users aria-hidden="true" className="h-11 w-11" />
@@ -105,13 +97,13 @@ function HomePage() {
       </div>
 
       <EmergenciaOverlay
-        aberto={pendente !== null}
-        destino={pendente?.imediata === false ? ORGAOS[pendente.tipo].nome : undefined}
+        aberto={confirmandoEmergencia}
         isSubmitting={isSubmitting}
         error={error}
         onConfirm={handleConfirmar}
         onCancel={handleCancelar}
       />
+      {compartilhando && <CompartilharContatoOverlay onClose={() => setCompartilhando(false)} />}
     </main>
   )
 }
