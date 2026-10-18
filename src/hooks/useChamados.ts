@@ -7,18 +7,17 @@ import type {
   Localizacao,
   RegistrarChamadoRequest,
 } from '../features/chamados/ChamadosService'
-import { LocationService } from '../services/LocationService'
+import { LocationError, LocationService } from '../services/LocationService'
 import type { Page, PageParams } from '../types/pagination'
 import { isProblemDetails, mensagemDeErro } from '../utils/problemDetails'
 
 /**
- * Se `localizacao` vier preenchida (mesmo que como undefined), o hook usa esse valor
- * em vez de consultar o GPS de novo, mantendo o que o usuário viu na tela.
+ * Se `localizacao` vier preenchida, o hook usa esse valor em vez de consultar o GPS
+ * de novo, mantendo o que o usuário viu na tela.
  */
-export type DetalhesChamado = RegistrarChamadoRequest
-
-// TODO: valores provisórios enquanto o back-end exigir órgão/ocorrência na emergência imediata
-const EMERGENCIA_IMEDIATA_PROVISORIO = { orgao: 'SAMU', ocorrenciaId: 1 } as const
+export type DetalhesChamado = Omit<RegistrarChamadoRequest, 'localizacao'> & {
+  localizacao?: Localizacao
+}
 
 type EnvioPendente = { idempotencyKey: string } & (
   | { imediata: true; payload: EmergenciaImediataPayload }
@@ -39,12 +38,13 @@ function falhaAmbigua(err: unknown): boolean {
   return !isProblemDetails(err) || err.status === 0 || err.status >= 500
 }
 
-async function obterLocalizacao(): Promise<Localizacao | undefined> {
+/** O back-end exige a localização em todo chamado, então sem ela não há envio */
+async function obterLocalizacao(): Promise<Localizacao> {
   try {
     return await LocationService.getCurrentPosition()
-  } catch {
-    // Sem localização o chamado ainda deve ser enviado
-    return undefined
+  } catch (err) {
+    const motivo = err instanceof LocationError ? err.message : 'Não foi possível obter sua localização.'
+    throw new Error(`${motivo} A localização é necessária para enviar o pedido.`)
   }
 }
 
@@ -72,20 +72,22 @@ export function useChamados() {
             : !imediata &&
               envio.payload.orgao === detalhes?.orgao &&
               envio.payload.ocorrenciaId === detalhes?.ocorrenciaId &&
-              envio.payload.descricao === detalhes?.descricao)
+              envio.payload.detalheAdicional === detalhes?.detalheAdicional)
 
         if (!envio || !mesmoDisparo) {
-          const localizacao =
-            detalhes && 'localizacao' in detalhes ? detalhes.localizacao : await obterLocalizacao()
-          setSemLocalizacao(!localizacao)
+          let localizacao: Localizacao
+          try {
+            localizacao = detalhes?.localizacao ?? (await obterLocalizacao())
+            setSemLocalizacao(false)
+          } catch (err) {
+            setSemLocalizacao(true)
+            setError(err instanceof Error ? err.message : 'Não foi possível obter sua localização.')
+            return null
+          }
           const idempotencyKey = uuidv4()
           envio =
             imediata || !detalhes
-              ? {
-                  imediata: true,
-                  idempotencyKey,
-                  payload: { ...EMERGENCIA_IMEDIATA_PROVISORIO, localizacao },
-                }
+              ? { imediata: true, idempotencyKey, payload: { localizacao } }
               : { imediata: false, idempotencyKey, payload: { ...detalhes, localizacao } }
           pendente.current = envio
         }
@@ -144,8 +146,15 @@ export function useChamados() {
     }
   }, [])
 
+  /**
+   * Busca um chamado pelo id. Não guarda estado nem trata o erro: quem chama decide
+   * (ex.: o polling do acompanhamento ignora falhas temporárias e para nas definitivas).
+   */
+  const buscarChamadoPorId = useCallback((id: number) => ChamadosService.buscarPorId(id), [])
+
   return {
     dispararEmergencia,
+    buscarChamadoPorId,
     isSubmitting,
     error,
     semLocalizacao,

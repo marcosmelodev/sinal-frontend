@@ -23,7 +23,11 @@ function HomePage() {
 
   async function handleConfirmar() {
     const chamado = await dispararEmergencia(true)
-    if (chamado) navigate('/historico')
+    if (chamado) {
+      navigate(`/chamado/${chamado.id}/registrado`, {
+        state: { chamado, tituloOcorrencia: EMERGENCIA_IMEDIATA.nome },
+      })
+    }
   }
 
   function handleCancelar() {

@@ -1,14 +1,11 @@
 import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { AlertTriangle, Inbox } from 'lucide-react'
 import { buscarOcorrencia } from '../features/chamados/ocorrenciasData'
 import { isTipoChamado, orgaoDoTipo } from '../features/chamados/orgaos'
+import { isEncerrado, tituloStatus } from '../features/chamados/status'
 import { useChamados } from '../hooks/useChamados'
-
-function formatarData(iso: string): string {
-  const data = new Date(iso)
-  if (Number.isNaN(data.getTime())) return iso
-  return data.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).replace(',', '')
-}
+import { formatarData } from '../utils/formatters'
 
 function HistoricoChamadosPage() {
   const { listarHistorico, historico, carregandoHistorico, erroHistorico } = useChamados()
@@ -66,23 +63,31 @@ function HistoricoChamadosPage() {
                 : undefined
               const detalhe = ocorrencia?.titulo ?? chamado.descricao
               return (
-                <li
-                  key={chamado.id}
-                  className="flex min-h-16 items-center gap-3 border-b border-slate-200 py-3"
-                >
-                  <span className={`grid h-10 w-10 flex-none place-items-center rounded-[10px] text-white ${cor}`}>
-                    <Icon aria-hidden="true" className="h-[22px] w-[22px]" />
-                  </span>
-                  <span className="min-w-0">
-                    <b className="block">{nome}</b>
-                    {detalhe && <small className="block text-sm text-slate-600">{detalhe}</small>}
-                    <small className="block text-sm text-slate-600">
-                      {formatarData(chamado.criadoEm)}
-                    </small>
-                  </span>
-                  <span className="ml-auto text-right text-sm font-semibold text-primario">
-                    {chamado.status}
-                  </span>
+                <li key={chamado.id} className="border-b border-slate-200">
+                  <Link
+                    to={`/chamado/${chamado.id}/acompanhamento`}
+                    state={{ chamado }}
+                    className="flex min-h-16 items-center gap-3 py-3 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primario active:bg-slate-100"
+                  >
+                    <span className={`grid h-10 w-10 flex-none place-items-center rounded-[10px] text-white ${cor}`}>
+                      <Icon aria-hidden="true" className="h-[22px] w-[22px]" />
+                    </span>
+                    <span className="min-w-0">
+                      <b className="block">{nome}</b>
+                      {detalhe && <small className="block text-sm text-slate-600">{detalhe}</small>}
+                      <small className="block text-sm text-slate-600">
+                        {formatarData(chamado.criadoEm)}
+                      </small>
+                    </span>
+                    <span
+                      className={`ml-auto max-w-[45%] text-right text-sm font-semibold ${
+                        isEncerrado(chamado.status) ? 'text-neutro' : 'text-primario'
+                      }`}
+                    >
+                      {tituloStatus(chamado.status)}
+                      <span className="mt-0.5 block text-primario">Ver acompanhamento ›</span>
+                    </span>
+                  </Link>
                 </li>
               )
             })}

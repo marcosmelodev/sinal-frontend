@@ -7,6 +7,7 @@ import OrgaoHeader from '../components/chamados/OrgaoHeader'
 import type { TipoChamado } from '../features/chamados/ChamadosService'
 import { ORGAOS, isTipoChamado } from '../features/chamados/orgaos'
 import { useChamados } from '../hooks/useChamados'
+import type { SolicitacaoRegistradaState } from './SolicitacaoRegistadaPage'
 import { LocationError, LocationService } from '../services/LocationService'
 import type { Coordinates } from '../services/LocationService'
 
@@ -73,14 +74,19 @@ function ResumoChamadoPage() {
   }
 
   async function handleEnviar() {
+    // O back-end exige a localização; envia exatamente a que foi exibida na tela
+    if (localizacao.status !== 'obtida') return
+    const localizacaoEnviada = localizacao.coords
     const chamado = await dispararEmergencia(false, {
       orgao: orgaoId,
       ocorrenciaId,
-      descricao: detalhe.trim() || undefined,
-      // Envia exatamente a localização exibida; sem ela, o chamado segue mesmo assim
-      localizacao: localizacao.status === 'obtida' ? localizacao.coords : undefined,
+      detalheAdicional: detalhe.trim() || undefined,
+      localizacao: localizacaoEnviada,
     })
-    if (chamado) navigate('/historico')
+    if (chamado) {
+      const registrado: SolicitacaoRegistradaState = { chamado, tituloOcorrencia, localizacaoEnviada }
+      navigate(`/chamado/${chamado.id}/registrado`, { state: registrado })
+    }
   }
 
   const coords = localizacao.status === 'obtida' ? localizacao.coords : null
@@ -146,7 +152,7 @@ function ResumoChamadoPage() {
               <div className="flex flex-wrap items-center gap-2 rounded-xl border-2 border-dashed border-amber-700 px-3 py-2">
                 <AlertTriangle aria-hidden="true" className="h-6 w-6 flex-none text-amber-700" />
                 <span className="flex-1">
-                  {localizacao.mensagem} O pedido pode ser enviado sem localização.
+                  {localizacao.mensagem} A localização é necessária para enviar o pedido.
                 </span>
                 <button
                   type="button"
@@ -167,7 +173,7 @@ function ResumoChamadoPage() {
           <textarea
             id={detalheId}
             rows={2}
-            maxLength={120}
+            maxLength={500}
             value={detalhe}
             onChange={(e) => setDetalhe(e.target.value)}
             placeholder="Ex.: perto do portão azul"
@@ -178,12 +184,12 @@ function ResumoChamadoPage() {
         <div className="mt-auto flex flex-col gap-1 pt-2">
           <Button
             onClick={handleEnviar}
-            disabled={localizacao.status === 'obtendo' || isSubmitting}
-            aria-describedby={localizacao.status === 'obtendo' ? `${detalheId}-dica` : undefined}
+            disabled={localizacao.status !== 'obtida' || isSubmitting}
+            aria-describedby={localizacao.status !== 'obtida' ? `${detalheId}-dica` : undefined}
           >
             Enviar mensagem
           </Button>
-          {localizacao.status === 'obtendo' && (
+          {localizacao.status !== 'obtida' && (
             <p id={`${detalheId}-dica`} className="text-sm text-slate-600">
               Disponível quando a localização for obtida.
             </p>
