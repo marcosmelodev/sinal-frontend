@@ -6,7 +6,7 @@ export default {
       // Cores oficiais do Figma
       colors: {
         primario: '#3563E8',
-        emergencia: '#EF4444',
+        emergencia: '#DC2626',
         alerta: '#C2410C',
         sucesso: '#047857',
         neutro: '#64748B',

@@ -53,7 +53,9 @@ export function useChamados() {
 
       try {
         let envio = pendente.current
-        if (!envio || envio.imediata !== imediata) {
+        const mesmoDisparo =
+          envio?.imediata === imediata && (imediata || envio.payload.tipo === detalhes?.tipo)
+        if (!envio || !mesmoDisparo) {
           const localizacao = await obterLocalizacao()
           setSemLocalizacao(!localizacao)
           envio = {

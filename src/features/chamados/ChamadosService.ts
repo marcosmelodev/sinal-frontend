@@ -1,6 +1,9 @@
 import axiosClient from '../../api/axiosClient'
 import type { Page, PageParams } from '../../types/pagination'
 
+/** Enum `TipoChamado` do back-end */
+export type TipoChamado = 'POLICIA_MILITAR' | 'CORPO_DE_BOMBEIROS' | 'SAMU'
+
 export interface Localizacao {
   latitude: number
   longitude: number
@@ -11,7 +14,7 @@ export interface Localizacao {
 
 export interface Chamado {
   id: number
-  tipo: string
+  tipo: TipoChamado
   status: string
   descricao?: string
   localizacao?: Localizacao
@@ -19,7 +22,7 @@ export interface Chamado {
 }
 
 export interface AbrirChamadoPayload {
-  tipo?: string
+  tipo?: TipoChamado
   descricao?: string
   localizacao?: Localizacao
 }

@@ -1,37 +1,42 @@
-import { useRef } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Settings } from 'lucide-react'
+import { Settings, Users } from 'lucide-react'
 import EmergenciaOverlay from '../components/chamados/EmergenciaOverlay'
 import { EMERGENCIA_IMEDIATA, ORGAOS } from '../features/chamados/orgaos'
-import type { TipoChamado } from '../features/chamados/orgaos'
+import type { TipoChamado } from '../features/chamados/ChamadosService'
 import { useChamados } from '../hooks/useChamados'
 import logo from '../assets/logo.svg'
 
 type Disparo = { imediata: true } | { imediata: false; tipo: TipoChamado }
 
+const CARD_CLASSES =
+  'flex min-h-[150px] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-white/40 px-2 py-4 text-center text-white active:scale-[0.97] active:brightness-90 focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
+
 function HomePage() {
   const navigate = useNavigate()
   const { dispararEmergencia, isSubmitting, error, limparErro } = useChamados()
-  const ultimoDisparo = useRef<Disparo | null>(null)
-
-  async function disparar(disparo: Disparo) {
-    ultimoDisparo.current = disparo
-    const chamado = disparo.imediata
-      ? await dispararEmergencia(true)
-      : await dispararEmergencia(false, { tipo: disparo.tipo })
-    if (chamado) navigate('/historico')
-  }
+  // Disparo aguardando confirmação no modal
+  const [pendente, setPendente] = useState<Disparo | null>(null)
 
   function handleEmergenciaGeral() {
-    disparar({ imediata: true })
+    setPendente({ imediata: true })
   }
 
   function handleChamadoPadrao(tipo: TipoChamado) {
-    disparar({ imediata: false, tipo })
+    setPendente({ imediata: false, tipo })
   }
 
-  function handleRetry() {
-    if (ultimoDisparo.current) disparar(ultimoDisparo.current)
+  async function handleConfirmar() {
+    if (!pendente) return
+    const chamado = pendente.imediata
+      ? await dispararEmergencia(true)
+      : await dispararEmergencia(false, { tipo: pendente.tipo })
+    if (chamado) navigate('/historico')
+  }
+
+  function handleCancelar() {
+    setPendente(null)
+    limparErro()
   }
 
   const { Icon: IconeImediata } = EMERGENCIA_IMEDIATA
@@ -54,7 +59,7 @@ function HomePage() {
 
       <div>
         <h1 className="text-[22px] font-bold">
-          Olá <span aria-hidden="true">👋</span>
+          Olá, Marcos <span aria-hidden="true">👋</span>
         </h1>
         <p className="text-slate-300">Como podemos te ajudar?</p>
       </div>
@@ -62,7 +67,6 @@ function HomePage() {
       <button
         type="button"
         onClick={handleEmergenciaGeral}
-        disabled={isSubmitting}
         className="flex min-h-24 w-full flex-col items-center justify-center rounded-2xl border-[3px] border-white bg-emergencia px-4 py-3 font-bold leading-tight text-white active:scale-[0.98] active:brightness-90 focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
       >
         <span className="flex items-center gap-2 text-[21px]">
@@ -80,8 +84,7 @@ function HomePage() {
               key={tipo}
               type="button"
               onClick={() => handleChamadoPadrao(tipo)}
-              disabled={isSubmitting}
-              className={`flex min-h-[150px] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-white/40 px-2 py-4 text-center text-white active:scale-[0.97] active:brightness-90 focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${cor}`}
+              className={`${CARD_CLASSES} ${cor}`}
             >
               <Icon aria-hidden="true" className="h-11 w-11" />
               <b className="text-[19px] leading-tight">{nome}</b>
@@ -89,13 +92,25 @@ function HomePage() {
             </button>
           )
         })}
+
+        <button
+          type="button"
+          onClick={() => navigate('/contatos')}
+          className={`${CARD_CLASSES} bg-sucesso`}
+        >
+          <Users aria-hidden="true" className="h-11 w-11" />
+          <b className="text-[19px] leading-tight">Avisar contato</b>
+          <span className="text-sm font-semibold">Pessoa de confiança</span>
+        </button>
       </div>
 
       <EmergenciaOverlay
+        aberto={pendente !== null}
+        destino={pendente?.imediata === false ? ORGAOS[pendente.tipo].nome : undefined}
         isSubmitting={isSubmitting}
         error={error}
-        onCancel={limparErro}
-        onRetry={handleRetry}
+        onConfirm={handleConfirmar}
+        onCancel={handleCancelar}
       />
     </main>
   )

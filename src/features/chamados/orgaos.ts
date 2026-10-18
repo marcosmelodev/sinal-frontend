@@ -1,7 +1,6 @@
-import { CircleHelp, OctagonAlert, Shield, Ambulance, Flame, Users } from 'lucide-react'
+import { Ambulance, CircleHelp, Flame, OctagonAlert, Shield } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-
-export type TipoChamado = 'SAMU' | 'BOMBEIROS' | 'POLICIA_MILITAR' | 'CONTATO_CONFIANCA'
+import type { TipoChamado } from './ChamadosService'
 
 export interface Orgao {
   nome: string
@@ -14,18 +13,17 @@ export interface Orgao {
 /** Ordem igual à grade da tela inicial na referência visual */
 export const ORGAOS: Record<TipoChamado, Orgao> = {
   SAMU: { nome: 'SAMU', descricao: 'Atendimento médico', Icon: Ambulance, cor: 'bg-emergencia' },
-  BOMBEIROS: { nome: 'Bombeiros', descricao: 'Incêndios e resgates', Icon: Flame, cor: 'bg-alerta' },
+  CORPO_DE_BOMBEIROS: {
+    nome: 'Bombeiros',
+    descricao: 'Incêndios e resgates',
+    Icon: Flame,
+    cor: 'bg-alerta',
+  },
   POLICIA_MILITAR: {
     nome: 'Polícia Militar',
     descricao: 'Segurança e ocorrências',
     Icon: Shield,
     cor: 'bg-primario',
-  },
-  CONTATO_CONFIANCA: {
-    nome: 'Avisar contato',
-    descricao: 'Pessoa de confiança',
-    Icon: Users,
-    cor: 'bg-sucesso',
   },
 }
 
@@ -40,8 +38,6 @@ const DESCONHECIDO: Orgao = { nome: 'Chamado', descricao: '', Icon: CircleHelp, 
 
 /** Resolve o visual de um chamado vindo da API pelo seu `tipo` */
 export function orgaoDoTipo(tipo: string | undefined): Orgao {
-  if (!tipo) return DESCONHECIDO
-  if (tipo in ORGAOS) return ORGAOS[tipo as TipoChamado]
-  if (tipo === 'EMERGENCIA_IMEDIATA') return EMERGENCIA_IMEDIATA
-  return { ...DESCONHECIDO, nome: tipo }
+  if (tipo && tipo in ORGAOS) return ORGAOS[tipo as TipoChamado]
+  return tipo ? { ...DESCONHECIDO, nome: tipo } : DESCONHECIDO
 }

@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SINAL — Protótipo visual 3.1</title>
+<style>
+/* Tokens aprovados (Etapa 3). "aux" = tokens auxiliares registrados, não substituem os aprovados */
+:root{--primary:#2563EB;--samu:#E53935;--bomb:#F97316;--pm:#1E3A8A;--imed:#DC2626;--ok:#10B981;--info:#64748B;--bg:#0F172A;
+--bg2:#14267A;--surface:#1E293B;--text:#F8FAFC;--muted:#CBD5E1;--line:#64748B;--ink:#0F172A;--ink2:#475569;--bd:#94A3B8;--okd:#047857;--warn:#B45309;--navb:#0B1226;/* aux */
+color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 Inter,Roboto,system-ui,sans-serif}
+button,input,textarea,select{font:inherit;color:inherit}
+#rv{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 12px;font-size:14px;background:var(--surface);border-bottom:1px solid var(--line)}
+#rv button,#rv select{min-height:44px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
+#rv button.on{border-color:var(--primary);outline:2px solid var(--primary)}
+#fr{margin:0 auto;width:100%;max-width:390px;min-height:calc(100vh - 120px);display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);overflow:hidden}
+#fr.t{max-width:600px}#fr.d{max-width:640px}
+main{flex:1;display:flex;flex-direction:column}
+h1{font-size:22px;margin:0}h2{font-size:20px;margin:0}p{margin:0}.mu{color:var(--muted);font-size:14px}.lead{color:var(--muted)}
+.dk{padding:16px 20px 24px;display:flex;flex-direction:column;gap:16px;flex:1;position:relative}
+.dh{padding:20px 20px 36px;text-align:center}
+.oh{padding:12px 20px 40px;display:flex;flex-direction:column;gap:12px}.oh p{font-size:14px}
+.sheet{background:#fff;color:var(--ink);border-radius:28px 28px 0 0;padding:24px 20px 28px;flex:1;display:flex;flex-direction:column;gap:16px;margin-top:-24px;position:relative}
+.sheet .mu{color:var(--ink2)}.sheet .bk{color:var(--ink)}
+.bk{align-self:flex-start;min-height:44px;background:none;border:0;display:flex;align-items:center;gap:4px;cursor:pointer;font-weight:600;color:inherit}
+.btn{min-height:48px;width:100%;border-radius:12px;border:2px solid transparent;background:var(--primary);color:#fff;font-weight:600;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;padding:0 16px}
+.btn:active,.btn.pr{filter:brightness(.8);outline:3px solid var(--text)}
+.sheet .btn:active{outline-color:var(--ink)}
+.btn:disabled{background:transparent;border:2px dashed var(--bd);color:var(--muted);cursor:not-allowed;filter:none;outline:0}
+.sheet .btn:disabled{color:var(--ink2)}
+.btn.out{background:transparent;border-color:var(--primary);color:var(--text)}.sheet .btn.out{color:var(--ink)}
+.btn.txt{background:none;color:var(--muted);text-decoration:underline}.sheet .btn.txt{color:var(--ink2)}
+.btn.ok{background:var(--okd)}.btn.pill{background:#fff;color:var(--ink);border-radius:999px}
+.lk{background:none;border:0;min-height:44px;padding:0 4px;color:var(--primary);font-weight:700;text-decoration:underline;cursor:pointer}
+.imed{min-height:64px;background:var(--imed);border:3px solid #fff;border-radius:16px;font-size:19px;flex-direction:column;gap:0;line-height:1.2}
+.imed.hero{min-height:96px;font-size:21px}.imed span{display:flex;gap:8px;align-items:center}.imed small{font-size:14px;font-weight:500}
+.btn[aria-busy=true]{pointer-events:none}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g .w{grid-column:1/-1}
+.hm{grid-auto-rows:1fr}
+.hc{border:2px solid #ffffff66;border-radius:16px;min-height:150px;padding:16px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;cursor:pointer;font-size:14px}
+.hc b{font-size:19px;line-height:1.15}.hc span{font-weight:600;font-size:14px}
+.hc:active{filter:brightness(.82);transform:scale(.97);outline:3px solid #fff}
+.oc{background:#fff;color:var(--ink);border:2px solid var(--bd);border-left:8px solid var(--c);border-radius:12px;min-height:88px;padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;font-weight:600;font-size:16px;cursor:pointer;position:relative;overflow-wrap:anywhere}
+.oc.row{flex-direction:row;align-items:center;min-height:64px}
+.oc:active,.oc.pr{border-color:var(--ink);transform:scale(.97)}
+.oc.sel{border-color:var(--primary);outline:3px solid var(--primary)}.oc.sel::after{content:"✓ Selecionado";position:absolute;right:8px;top:6px;font-size:12px;color:var(--ink);background:#fff;padding:0 4px}
+.ic{width:40px;height:40px;border-radius:10px;background:var(--c);display:grid;place-items:center;color:var(--fg,#fff);flex:none}
+.card{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;color:var(--ink)}
+.wc{background:#fff;color:var(--ink);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.fld{display:flex;flex-direction:column;gap:4px;font-weight:600}
+.fld input,.fld textarea,.fld select{min-height:48px;border-radius:12px;border:2px solid var(--bd);background:#fff;color:var(--ink);padding:8px 12px;font-weight:400}
+.fld input:focus,.fld textarea:focus,.fld select:focus{outline:3px solid var(--primary)}
+.pw{position:relative}.pw input{width:100%;padding-right:96px}.pw button{position:absolute;right:4px;top:2px;min-height:44px;background:none;border:0;color:var(--primary);font-weight:700;cursor:pointer}
+.row2{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.sf{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #E2E8F0}.sf span{color:var(--ink2)}.sf b{text-align:right}
+.map{border:1px solid #CBD5E1;border-radius:12px;overflow:hidden}.map svg{display:block}.coords{padding:8px 12px;font-size:14px;color:var(--ink2);background:#F8FAFC}
+.ls{display:flex;gap:8px;align-items:center;border:2px solid var(--bd);border-radius:12px;padding:8px 12px;min-height:48px;flex-wrap:wrap;background:#fff;color:var(--ink)}
+.ls.ok{border-color:var(--okd)}.ls.bad{border:2px dashed var(--warn)}.ls.warn{border-color:var(--warn)}
+.ls .btn{width:auto;min-height:44px;margin-left:auto}
+.sp{width:20px;height:20px;border:3px solid var(--bd);border-top-color:var(--ink);border-radius:50%;animation:s 1s linear infinite;flex:none}
+@keyframes s{to{transform:rotate(360deg)}}
+.btn.load::before{content:"";width:18px;height:18px;border:3px solid #fff5;border-top-color:#fff;border-radius:50%;animation:s 1s linear infinite}
+@media(prefers-reduced-motion:reduce){.sp,.btn.load::before{animation:none}}
+.sim{position:sticky;top:0;z-index:5;background:var(--info);color:#fff;padding:12px 20px;display:flex;gap:8px;font-weight:600;border-bottom:3px solid #fff}
+.eb{background:#fff;color:var(--ink);border:2px solid var(--warn);border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 20px 0}.eb .btn{width:auto;min-height:44px}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
+.tl li{display:flex;gap:12px;align-items:center;min-height:44px;font-weight:600}
+.tl i{width:32px;height:32px;border-radius:50%;border:3px solid var(--bd);display:grid;place-items:center;flex:none;font-style:normal}
+.tl .done i{background:var(--okd);border-color:var(--okd);color:#fff}.tl .cur i{border-color:var(--primary);background:var(--primary);color:#fff}
+.tl small{display:block;font-weight:400;color:var(--ink2);font-size:14px}.tl .pend{color:var(--ink2)}
+nav{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(3,1fr);background:var(--navb);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
+nav button{min-height:56px;background:none;border:0;border-top:4px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:14px;cursor:pointer;color:var(--muted)}
+nav button.on{border-top-color:var(--primary);font-weight:700;color:#fff}
+.ov{position:fixed;inset:0;background:#000b;display:grid;place-items:center;padding:16px;z-index:20;animation:f .2s}.ov.out{opacity:0;transition:opacity .2s}
+@keyframes f{from{opacity:0}}
+.dlg{background:var(--surface);border:3px solid var(--imed);border-radius:20px;padding:24px;width:min(100%,400px);display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;color:var(--text)}
+.dlg>svg{color:var(--imed)}.dlg .eb{margin:0}
+.shs{position:fixed;left:0;right:0;bottom:0;background:#fff;color:var(--ink);border-top:4px solid var(--primary);border-radius:20px 20px 0 0;padding:16px;display:flex;flex-direction:column;gap:8px;z-index:30;max-width:640px;margin:auto}
+#ts{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:40;background:#fff;color:var(--ink);border:2px solid var(--warn);border-radius:12px;padding:12px 16px;display:flex;gap:8px;max-width:92%}
+.big{display:grid;place-items:center;gap:8px;text-align:center;padding:24px 0}.big .ic{width:72px;height:72px;border-radius:50%}
+.tag{font-size:14px;border:1px solid var(--line);border-radius:8px;padding:2px 8px;color:var(--muted)}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px;letter-spacing:.14em}
+.avt{width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.wave{position:absolute;left:0;bottom:0;width:100%;height:140px;pointer-events:none}
+.hi{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #E2E8F0}.hi small{color:var(--ink2);display:block}.hi .st{margin-left:auto;font-size:14px;color:var(--primary);font-weight:600;text-align:right}
+.shs .btn.out{color:var(--ink);border-color:var(--primary)}.shs .btn.txt{color:var(--ink2)}.shs .btn:active{outline-color:var(--ink)}
+#ts[hidden]{display:none}
+button.hi{width:100%;background:none;border:0;text-align:left;color:var(--ink);cursor:pointer;font:inherit;min-height:64px}button.hi:active{background:#F1F5F9}
+.hw{border-bottom:1px solid #E2E8F0;display:flex;flex-direction:column}
+</style></head>
+<body>
+<div id="rv" role="region" aria-label="Painel de revisão (fora do app)">
+ <b>Revisão:</b>
+ <label>Tela <select id="jm"></select></label>
+ <label>Localização resulta em <select id="lt"><option value="obtida">Obtida</option><option value="baixa">Baixa precisão</option><option value="negada">Negada</option><option value="indisp">Indisponível</option><option value="erro">Erro</option></select></label>
+ <button data-a="net">Erro de rede</button><button data-a="sess">Sessão expirada</button>
+ <span>Largura:</span><button data-w="" class="on">Mobile</button><button data-w="t">Tablet</button><button data-w="d">Desktop</button>
+</div>
+<div id="fr"></div><div id="md"></div><div id="sx"></div><div id="ts" hidden role="status"></div>
+<script>
+const $=s=>document.querySelector(s);
+const P={oct:'<polygon points="8,2 16,2 22,8 22,16 16,22 8,22 2,16 2,8"/><path d="M12 7v6M12 16.5v.5"/>',med:'<path d="M12 5v14M5 12h14"/>',amb:'<path d="M2 16V7h12v9M14 10h4l4 4v2h-2M2 16h2M8 16h6"/><circle cx="6" cy="17.500" r="1.800"/><circle cx="17" cy="17.500" r="1.800"/><path d="M8 9v4M6 11h4"/>',fire:'<path d="M12 3c1 4 5 6 5 11a5 5 0 0 1-10 0c0-3 2-4 3-7 1 1 2 2 2 4z"/>',shield:'<path d="M12 3l8 3v6c0 5-3.500 8-8 9-4.500-1-8-4-8-9V6z"/>',share:'<path d="M4 12v7h16v-7M12 3v12M8 7l4-4 4 4"/>',pin:'<path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2"/>',check:'<path d="M5 12l5 5 9-10"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',warn:'<path d="M12 3l10 18H2zM12 10v5M12 18v.5"/>',home:'<path d="M3 11l9-8 9 8v10h-6v-6H9v6H3z"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',users:'<circle cx="9" cy="8" r="3.500"/><circle cx="17" cy="9" r="2.500"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6M16 14c3 0 6 1.500 6 5"/>',back:'<path d="M15 5l-7 7 7 7"/>',q:'<circle cx="12" cy="12" r="9"/><path d="M9.500 9a2.500 2.500 0 1 1 3.500 2.300c-.7.4-1 1-1 1.700M12 17v.5"/>',bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',wind:'<path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/>',drop:'<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>',car:'<path d="M4 16v-5l2-5h12l2 5v5M4 16h16M7 19v-3M17 19v-3"/>',tree:'<path d="M12 3l6 9h-4l4 6H6l4-6H6zM12 18v3"/>'};
+const ic=(n,s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+const logo=(s=72)=>`<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke-width="4" stroke-linecap="round" aria-hidden="true"><circle cx="32" cy="40" r="5" fill="#fff"/><path d="M22 31a14 14 0 0 1 20 0" stroke="#fff"/><path d="M14 23a25 25 0 0 1 36 0" stroke="#60A5FA"/><path d="M6 15a36 36 0 0 1 52 0" stroke="#fff" opacity=".5"/></svg>`;
+// Categorias: listas consolidadas da Etapa 2 ("Outro / Não sei informar" é adicionada na tela)
+const O={SAMU:{n:'SAMU',c:'--samu',i:'amb',fg:'#fff',s:'Serviço de Atendimento Móvel de Urgência',h:'Atendimento médico',o:[['Pessoa desacordada / Não respira','user'],['Dor forte no peito / Suspeita de infarto','med'],['Falta de ar grave / Engasgo','wind'],['Convulsão / Ataque epiléptico','bolt'],['Sangramento grave / Hemorragia','drop'],['Queda de altura com fratura','warn'],['Boca torta / Perda de força (Suspeita de AVC)','user'],['Queimadura grave','fire'],['Intoxicação / Envenenamento','warn'],['Tentativa de suicídio','shield']]},
+BOM:{n:'Corpo de Bombeiros',b:'Bombeiros',c:'--bomb',i:'fire',fg:'#0F172A',s:'Combate a incêndios e resgates',h:'Incêndios e resgates',o:[['Incêndio em residência / Prédio','fire'],['Incêndio em mata / Vegetação','tree'],['Acidente com pessoa presa nas ferragens','car'],['Vazamento de gás com cheiro forte','wind'],['Afogamento / Vítima em rio ou piscina','drop'],['Desabamento / Risco de queda de estrutura','home'],['Choque elétrico / Fiação caída na rua','bolt'],['Queda de árvore sobre casa ou via','tree'],['Ataque de animais perigosos','warn'],['Pessoa ou animal preso em local de risco','shield']]},
+PM:{n:'Polícia Militar',c:'--pm',i:'shield',fg:'#fff',s:'Segurança pública e ocorrências',h:'Segurança e ocorrências',o:[['Assalto / Roubo em andamento','warn'],['Agressão física / Briga','user'],['Violência doméstica / Pessoa em perigo','home'],['Invasão de domicílio / Estabelecimento','home'],['Ameaça de morte / Arma de fogo','shield'],['Furto de veículo / Objeto','car'],['Disparos de arma de fogo','warn'],['Pessoa suspeita rondando','user'],['Desordem / Perturbação do sossego','wind'],['Acidente de trânsito com briga / Fuga','car']]}};
+const LS={obtendo:['Obtendo localização…','sp'],obtida:['Localização obtida','check','ok'],negada:['Localização negada. Permita o acesso no navegador.','x','bad'],indisp:['Localização indisponível neste aparelho.','x','bad'],baixa:['Localização com baixa precisão. Pode estar imprecisa: envie assim ou tente melhorar.','warn','warn'],erro:['Erro ao obter localização.','warn','bad']};
+const now=()=>new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}).replace(',','');
+const S={v:'splash',org:null,occ:null,imm:false,loc:'obtendo',tg:'obtida',m:null,merr:'',step:0,ct:null,shared:false,ban:false,time:'',n:'4587',lq:'',mw:false,det:'',hi:0,cur:'',from:'',
+ contacts:[['Maria Souza','(61) 90000-0001'],['João Lima','(61) 90000-0002'],['Ana Reis','(61) 90000-0003']],
+ hist:[{id:'4521',org:'PM',occ:'Ameaça de morte / Arma de fogo',time:'03/10/2026 14:32',det:'',lq:'',imm:false,step:2,st:'Simulação encerrada'}]};
+let T=[];
+const brand=(s=28)=>`<div class="brand">${logo(s)}SINAL</div>`;
+const dh=(t,b)=>`<header class="dh">${b?`<button class="bk" data-a="go" data-v="${b}">${ic('back')}Voltar</button>`:''}<h1>${t}</h1></header>`;
+const ohd=(k,b)=>{const o=O[k];return `<header class="oh" style="background:var(${o.c});color:${o.fg}"><button class="bk" data-a="go" data-v="${b}">${ic('back')}Voltar</button><div class="row2" style="justify-content:flex-start;gap:16px"><span class="ic" style="background:${o.fg=='#fff'?'#ffffff33':'#0F172A22'};color:${o.fg};width:64px;height:64px">${ic(o.i,40)}</span><div><h1>${o.n}</h1><p>${o.s}</p></div></div></header>`};
+const hc=k=>`<button class="hc" style="background:var(${O[k].c});color:${O[k].fg}" data-a="org" data-v="${k}">${ic(O[k].i,44)}<b>${O[k].b||O[k].n}</b><span>${O[k].h}</span></button>`;
+const fld=(l,t='text',ph='',id='')=>`<label class="fld">${l}<input ${id?`id="${id}"`:''} type="${t}" placeholder="${ph}"></label>`;
+const pw=l=>`<label class="fld">${l}<span class="pw"><input type="password" placeholder="Digite sua senha"><button type="button" data-a="eye">Mostrar</button></span></label>`;
+const sf=(a,b)=>`<div class="sf"><span>${a}</span><b>${b}</b></div>`;
+const mapSvg=h=>`<svg viewBox="0 0 360 130" width="100%" role="img" aria-label="Mapa ilustrativo"><rect width="360" height="130" fill="#E2E8F0"/><path d="M0 90L360 40M120 0L180 130M260 0L230 130" stroke="#fff" stroke-width="10"/><path d="M20 20h60v30H20zM250 80h80v36h-80z" fill="#CBD5E1"/>${h?'<circle cx="180" cy="62" r="22" fill="#2563EB" opacity=".18"/><path d="M180 90s-14-14-14-26a14 14 0 0 1 28 0c0 12-14 26-14 26z" fill="#2563EB"/><circle cx="180" cy="64" r="5" fill="#fff"/>':'<text x="180" y="70" text-anchor="middle" fill="#475569" font-size="14">Sem localização</text>'}</svg>`;
+const lqn=(q=S.lq)=>q=='baixa'?`<div class="ls warn" role="status" style="width:100%">${ic('warn')}<span>Localização enviada com baixa precisão. Pode estar imprecisa.</span></div>`:'';
+const V={
+splash:()=>`<div class="dk" style="align-items:center;text-align:center;justify-content:center;gap:12px"><svg class="wave" viewBox="0 0 400 140" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70C100 20 220 120 400 40V140H0z" fill="#fff" opacity=".07"/></svg>${logo(104)}<h1 style="font-size:38px;letter-spacing:.16em">SINAL</h1><p>Emergência acessível, visual e direta.</p><p class="mu">Solicite ajuda de forma rápida, simples e acessível. Sem ligação e sem áudio.</p><p class="tag">Protótipo acadêmico — simulação</p><div style="flex:1"></div><button class="btn pill" data-a="go" data-v="login">Começar</button><button class="btn txt" data-a="go" data-v="login">Já tenho uma conta</button></div>`,
+login:()=>`<div class="dk" style="flex:0;align-items:center;text-align:center;padding-bottom:40px">${logo(64)}<div class="brand" style="font-size:26px">SINAL</div></div><section class="sheet"><p style="text-align:center">Acesse sua conta para continuar.</p>${fld('CPF ou e-mail','text','Digite seu CPF ou e-mail')}${pw('Senha')}<button class="btn" data-a="go" data-v="home">Entrar</button><p class="mu" style="text-align:center">Não tem uma conta? <button class="lk" data-a="go" data-v="cad">Cadastre-se</button></p></section>`,
+cad:()=>`<section class="sheet" style="border-radius:0;margin:0;background:#fff"><button class="bk" data-a="go" data-v="login">${ic('back')}Voltar</button><div><h1>Criar conta</h1><p class="mu">Preencha os dados para se cadastrar.</p></div>${fld('Nome completo','text','Digite seu nome')}${fld('CPF','text','Digite seu CPF')}${fld('E-mail','email','Digite seu e-mail')}${pw('Senha')}<button class="btn" data-a="go" data-v="home">Cadastrar</button></section>`,
+home:()=>`<div class="dk">${brand()}<div><h1>Olá, Usuário 👋</h1><p class="lead">Como podemos te ajudar?</p></div>
+<button class="btn imed hero" data-a="imm"><span>${ic('oct',32)}EMERGÊNCIA IMEDIATA</span><small>Perigo imediato</small></button>
+<div class="g hm">${hc('SAMU')}${hc('BOM')}${hc('PM')}<button class="hc" style="background:var(--ok);color:#0F172A" data-a="go" data-v="contato">${ic('users',44)}<b>Avisar contato</b><span>Pessoa de confiança</span></button></div></div>`,
+occ:()=>{const o=O[S.org],st=`--c:var(${o.c});--fg:${o.fg}`;return `${ohd(S.org,'home')}<section class="sheet"><h2>O que está acontecendo?</h2><div class="g">${o.o.map(([l,i])=>`<button class="oc ${S.occ==l?'sel':''}" style="${st}" data-a="occ" data-v="${l}"><span class="ic">${ic(i,24)}</span>${l}</button>`).join('')}<button class="oc w row ${S.occ=='Outro / Não sei informar'?'sel':''}" style="--c:var(--info)" data-a="occ" data-v="Outro / Não sei informar"><span class="ic">${ic('q',24)}</span>Outro / Não sei informar</button></div></section>`},
+res:()=>`${ohd(S.org,'occ')}<section class="sheet"><h2>Resumo</h2><div class="card">${sf('Órgão',O[S.org].n)}${sf('Ocorrência',S.occ)}</div><div><b>Localização</b><div id="loc" style="margin-top:8px"></div></div>
+<label class="fld">Detalhe adicional (opcional)<input id="dt" maxlength="80" placeholder="Ex.: perto do portão azul"></label><div><button class="btn" id="send" data-a="send" disabled>Enviar mensagem</button><p class="mu" id="hint" style="margin-top:4px"></p></div><button class="btn txt" data-a="go" data-v="home">Cancelar</button></section>`,
+reg:()=>{const o=O[S.org];return `<div class="dk" style="align-items:center"><div class="big" style="padding:16px 0 0"><span class="ic" style="--c:var(--ok);color:#0F172A">${ic('check',40)}</span><h1>Solicitação registrada</h1><p class="lead">${S.imm?'Emergência Imediata → ':''}${o.n}</p><p class="tag">Protótipo acadêmico — nenhuma central real foi acionada.</p></div>${lqn()}
+<div class="wc" style="width:100%"><b>Você solicitou:</b>${sf('Órgão',o.n)}${sf('Ocorrência',S.occ)}${sf('Localização','-15.7939, -47.8828'+(S.lq=='baixa'?' (baixa precisão)':''))}${sf('Horário',S.time)}${sf('Código da simulação','#SIM-'+S.n)}</div><button class="btn" data-a="go" data-v="ac">Ver acompanhamento</button><button class="btn txt" data-a="go" data-v="home">Voltar para o início</button></div>`},
+ac:()=>{const h=S.hist.find(x=>x.id==S.cur);if(!h)return V.hist();const o=O[h.org];
+return `<div class="sim">${ic('q')}<span>PROTÓTIPO ACADÊMICO — Nenhuma central real foi acionada.</span></div><div class="dk"><h1>Acompanhamento</h1>${lqn(h.lq)}<div class="wc"><ol class="tl">${ST.map((l,i)=>{const d=i<h.step||(h.step==2&&i==2),c=i==h.step&&h.step<2;return `<li class="${d?'done':c?'cur':'pend'}"><i>${d?'✓':c?'●':''}</i><span>${l}<small>${d?'Concluído':c?'Atual':'Aguardando'}</small></span></li>`}).join('')}</ol></div>
+<div class="wc">${sf('Órgão',(h.imm?'Emergência Imediata → ':'')+o.n)}${sf('Localização','Enviada'+(h.lq=='baixa'?' · baixa precisão':''))}${sf('Código da simulação','#SIM-'+h.id)}</div><button class="btn" data-a="go" data-v="home">Voltar ao início</button>${S.from?`<button class="btn out" data-a="go" data-v="${S.from}">Voltar ao ${S.from=='hist'?'histórico':'detalhes'}</button>`:''}</div>`},
+contato:()=>S.shared?`<div class="dk" style="align-items:center;justify-content:center"><div class="big"><span class="ic" style="--c:var(--ok);color:#0F172A">${ic('check',40)}</span><h1>Mensagem pronta para envio.</h1></div><button class="btn" data-a="go" data-v="home">Voltar ao início</button></div>`:
+`<header class="oh" style="background:var(--ok);color:#0F172A"><button class="bk" data-a="go" data-v="home">${ic('back')}Voltar</button><div class="row2" style="justify-content:flex-start;gap:16px"><span class="ic" style="background:#0F172A22;color:#0F172A;width:64px;height:64px">${ic('users',40)}</span><div><h1>Avisar contato de confiança</h1><p>Avise uma pessoa de confiança que você precisa de ajuda.</p></div></div></header>
+<section class="sheet"><label class="fld">Selecione o contato<select id="cs"><option value="">Selecione…</option>${S.contacts.map((c,i)=>`<option value="${i}" ${S.ct===i?'selected':''}>${c[0]} — ${c[1]}</option>`).join('')}</select></label>
+<label class="fld">Mensagem (opcional)<textarea rows="3" maxlength="120" placeholder="Ex.: Preciso de ajuda."></textarea></label><p class="mu row2" style="justify-content:flex-start">${ic('pin',18)}Sua localização será incluída automaticamente.</p><button class="btn ok" id="shb" data-a="share" ${S.ct===null?'disabled':''}>${ic('share',20)}Compartilhar</button><button class="btn txt" data-a="go" data-v="home">Cancelar</button></section>`,
+contatos:()=>`${dh('Contatos de confiança','perfil')}<section class="sheet"><p class="mu">${S.contacts.length} de 5 contatos</p>${S.contacts.map((c,i)=>`<div class="hi"><span class="avt">${c[0][0]}</span><span><b>${c[0]}</b><small>${c[1]}</small></span><button class="btn out" style="width:auto;min-height:44px;margin-left:auto" data-a="del" data-v="${i}">Remover</button></div>`).join('')}
+<div class="card">${fld('Nome','text','Nome do contato','cn')}${fld('Telefone','tel','(00) 00000-0000','cp')}<button class="btn" data-a="add" ${S.contacts.length>=5?'disabled':''}>Adicionar contato</button>${S.contacts.length>=5?'<p class="mu">Limite de 5 contatos atingido.</p>':''}</div></section>`,
+hist:()=>`${dh('Histórico')}<section class="sheet">${S.hist.length?S.hist.map((h,i)=>{const o=O[h.org];return `<div class="hw"><button class="hi" data-a="hd" data-v="${i}" aria-label="Ver detalhes da solicitação ${h.id}"><span class="ic" style="--c:var(${o.c});--fg:${o.fg}">${ic(o.i,22)}</span><span><b>${h.imm?'Emergência Imediata':(o.b||o.n)}</b><small>${h.imm?o.n:h.occ}</small><small>${h.time}</small></span><span class="st">${h.st}<br>Ver detalhes ›</span></button>${h.step<2?`<button class="btn out" style="min-height:44px;margin-bottom:12px" data-a="acomp" data-v="${i}">${ic('clock',18)}Ver acompanhamento</button>`:''}</div>`}).join(''):'<p class="mu">Nenhuma solicitação ainda.</p>'}</section>`,
+hdet:()=>{const h=S.hist[S.hi];if(!h)return V.hist();const o=O[h.org];return `${dh('Detalhes da solicitação','hist')}<section class="sheet"><div class="hi" style="border:0"><span class="ic" style="--c:var(${o.c});--fg:${o.fg}">${ic(o.i,22)}</span><span><b>${h.imm?'Emergência Imediata → ':''}${o.n}</b><small>${h.st}</small></span></div>
+<div class="sim" style="position:static;border-radius:12px;border:0">${ic('q')}<span>PROTÓTIPO ACADÊMICO — Nenhuma central real foi acionada.</span></div>
+<div class="card">${sf('Código da simulação','#SIM-'+h.id)}${sf('Órgão',o.n)}${sf('Ocorrência',h.occ)}${sf('Localização','-15.7939, -47.8828'+(h.lq=='baixa'?' (baixa precisão)':''))}${sf('Horário',h.time)}${sf('Detalhe adicional',h.det||'—')}${sf('Status',h.st)}</div>${h.step<2?`<button class="btn" data-a="acomp" data-v="${S.hi}">${ic('clock',20)}Ver acompanhamento</button>`:''}<button class="btn out" data-a="go" data-v="hist">Voltar ao histórico</button></section>`},
+perfil:()=>`${dh('Perfil')}<section class="sheet"><div class="hi" style="border:0"><span class="avt" style="width:56px;height:56px">U</span><span><b>Usuário Demonstração</b><small>demo@exemplo.com</small></span></div><button class="btn out" data-a="go" data-v="contatos">${ic('users',20)}Gerenciar contatos</button><button class="btn txt" data-a="go" data-v="login">Sair</button><p class="mu" style="text-align:center;margin-top:auto">SINAL — protótipo acadêmico</p></section>`};
+const NAV=[['home','Início','home'],['hist','Histórico','clock'],['perfil','Perfil','user']];
+const SH={contatos:'perfil',hdet:'hist'};
+function render(){const n=['home','hist','hdet','perfil','contatos'].includes(S.v),a=SH[S.v]||S.v;
+ const bn=S.ban&&S.v=='login'?`<div class="eb" role="alert">${ic('warn')}<b>Sua sessão expirou.</b> Entre novamente.</div>`:'';
+ $('#fr').innerHTML=bn+`<main>${V[S.v]()}</main>`+(n?`<nav aria-label="Navegação principal">${NAV.map(([k,l,i])=>`<button data-a="go" data-v="${k}" class="${a==k?'on':''}" ${a==k?'aria-current="page"':''}>${ic(i)}${l}</button>`).join('')}</nav>`:'');
+ $('#jm').value=S.v}
+function go(v){T.forEach(clearTimeout);T=[];S.v=v;if(v!='login')S.ban=false;if(v!='ac')S.from='';if(v=='contato')S.shared=false,S.ct=null;
+ render();scrollTo(0,0);$('#sx').innerHTML='';if(v=='res')startLoc()}
+function updLoc(){const [t,i,k]=LS[S.loc],ok=['obtida','baixa'].includes(S.loc);
+ $('#loc').innerHTML=`<div class="map">${mapSvg(ok)}<div class="coords">${ok?`Latitude: -15.7939 · Longitude: -47.8828 · Precisão: ${S.loc=='baixa'?'850':'10'} metros`:'Coordenadas indisponíveis'}</div></div><div class="ls ${k||''}" style="margin-top:8px">${i=='sp'?'<span class="sp"></span>':ic(i)}<span>${t}</span>${!ok&&S.loc!='obtendo'||S.loc=='baixa'?'<button class="btn out" data-a="retry">'+(S.loc=='baixa'?'Melhorar localização':'Tentar novamente')+'</button>':''}</div>`;
+ $('#send').disabled=!ok;$('#hint').textContent=ok?(S.loc=='baixa'?'Você pode enviar, mas a localização pode estar imprecisa.':''):'Disponível quando a localização for obtida.'}
+function startLoc(){S.loc='obtendo';updLoc();T.push(setTimeout(()=>{S.loc=S.tg;updLoc()},1400))}
+function modal(){const m=S.m;$('#md').innerHTML=m?`<div class="ov ${m=='closing'?'out':''}"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="mt">${ic('oct',44)}<h2 id="mt">Você está em perigo agora?</h2><p>Sua localização será obtida e a solicitação será enviada à Polícia Militar (simulação).</p>${S.merr?`<div class="eb">${ic('warn')}${S.merr}</div>`:''}${S.mw?`<div class="eb" role="status">${ic('warn')}Localização com baixa precisão. Pode estar imprecisa; enviando mesmo assim.</div>`:''}<button class="btn imed ${m=='load'?'load':''}" ${m=='load'?'aria-busy="true"':''} data-a="conf">${m=='load'?'Obtendo localização…':'ENVIAR AGORA'}</button><button class="btn txt" data-a="cancel">Cancelar</button></div></div>`:''}
+function closeM(){S.m='closing';modal();setTimeout(()=>{S.m=null;S.merr='';modal()},200)}
+function toast(t){const e=$('#ts');e.innerHTML=ic('warn')+t;e.hidden=false;setTimeout(()=>e.hidden=true,4000)}
+const ST=['Solicitação registrada','Simulação de encaminhamento em andamento','Simulação encerrada'];
+function tick(id,n){const h=S.hist.find(x=>x.id==id);if(!h)return;h.step=n;h.st=ST[n];if(['hist','hdet','ac'].includes(S.v))render()}
+function reg(){S.time=now();do{S.n=String(1000+Math.floor(Math.random()*9000))}while(S.hist.some(x=>x.id==S.n));S.cur=S.n;const id=S.n;
+ S.hist.unshift({id,org:S.org,occ:S.occ,time:S.time,det:S.det||'',lq:S.lq,imm:S.imm,step:0,st:ST[0]});
+ setTimeout(()=>tick(id,1),8000);setTimeout(()=>tick(id,2),20000)}
+const A={go:v=>go(v),org:v=>{S.org=v;S.imm=false;S.occ=null;go('occ')},
+ occ:v=>{S.occ=v;render();T.push(setTimeout(()=>go('res'),350))},
+ imm:()=>{S.m='open';S.merr='';modal()},cancel:closeM,
+ conf:()=>{S.m='load';S.merr='';S.mw=false;modal();setTimeout(()=>{if(S.m!='load')return;if(!['obtida','baixa'].includes(S.tg)){S.m='open';S.merr=LS[S.tg][0]+' Tente novamente.';modal();return}
+  const fin=()=>{if(S.m!='load')return;S.org='PM';S.occ='Emergência Imediata';S.imm=true;S.lq=S.tg;S.det='';S.m=null;S.mw=false;modal();reg('Solicitação registrada');go('reg')};
+  if(S.tg=='baixa'){S.mw=true;modal();setTimeout(fin,1100)}else fin()},1200)},
+ acomp:v=>{S.cur=S.hist[+v].id;S.from=S.v;go('ac')},
+ hd:v=>{S.hi=+v;go('hdet')},
+ send:()=>{S.lq=S.loc;S.det=$('#dt').value.trim();reg('Solicitação registrada');go('reg')},retry:startLoc,
+ eye:(v,t)=>{const i=t.previousElementSibling;i.type=i.type=='password'?'text':'password';t.textContent=i.type=='password'?'Mostrar':'Ocultar'},
+ share:()=>{$('#sx').innerHTML=`<div class="shs" role="dialog" aria-label="Compartilhamento nativo"><b>Compartilhar via… (simulação do compartilhamento nativo)</b><button class="btn out" data-a="shdone">SMS</button><button class="btn out" data-a="shdone">WhatsApp</button><button class="btn out" data-a="shdone">Telegram</button><button class="btn txt" data-a="shx">Cancelar</button></div>`},
+ shdone:()=>{S.shared=true;$('#sx').innerHTML='';render()},shx:()=>$('#sx').innerHTML='',
+ del:v=>{S.contacts.splice(+v,1);render()},add:()=>{const n=$('#cn').value.trim(),p=$('#cp').value.trim();if(n&&p&&S.contacts.length<5){S.contacts.push([n,p]);render()}else toast('Preencha nome e telefone.')},
+ net:()=>toast('Sem conexão. Verifique a internet e tente novamente.'),sess:()=>{S.ban=true;go('login')}};
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(t)A[t.dataset.a]?.(t.dataset.v,t);const w=e.target.closest('[data-w]');if(w){$('#fr').className=w.dataset.w;document.querySelectorAll('[data-w]').forEach(b=>b.classList.toggle('on',b==w))}});
+document.addEventListener('change',e=>{if(e.target.id=='cs'){S.ct=e.target.value===''?null:+e.target.value;$('#shb').disabled=S.ct===null}});
+$('#lt').onchange=e=>{S.tg=e.target.value;if(S.v=='res')startLoc()};
+const NM={splash:'1 Splash',login:'2 Login',cad:'3 Cadastro',home:'4 Home',occ:'5 Seleção de ocorrência',res:'6 Resumo',reg:'7 Solicitação registrada',ac:'8 Acompanhamento',contato:'9 Avisar contato',contatos:'10 Gerenciar contatos',hist:'11 Histórico',hdet:'11.1 Detalhe do registro',perfil:'12 Perfil'};
+$('#jm').innerHTML=Object.entries(NM).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')+'<option value="modal">13 Modal Emergência Imediata</option>';
+$('#jm').onchange=e=>{const v=e.target.value;if(v=='modal'){go('home');A.imm()}else{if(['occ','res','reg','ac'].includes(v)&&!S.org){S.org='PM';S.occ='Assalto / Roubo em andamento'}if(['reg','ac'].includes(v)&&!S.cur)reg();go(v)}};
+render();
+</script></body></html>
