@@ -2,6 +2,8 @@ export interface Coordinates {
   latitude: number
   longitude: number
   precisao: number
+  /** Momento da leitura do GPS, em ISO 8601 */
+  timestamp: string
 }
 
 export type LocationErrorCode = 'NAO_SUPORTADO' | 'PERMISSAO_NEGADA' | 'INDISPONIVEL' | 'TEMPO_ESGOTADO'
@@ -37,11 +39,12 @@ export function getCurrentPosition(): Promise<Coordinates> {
     }
 
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) =>
+      ({ coords, timestamp }) =>
         resolve({
           latitude: coords.latitude,
           longitude: coords.longitude,
           precisao: coords.accuracy,
+          timestamp: new Date(timestamp).toISOString(),
         }),
       (error) => {
         switch (error.code) {

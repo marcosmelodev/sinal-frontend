@@ -4,11 +4,13 @@ import type { Page, PageParams } from '../../types/pagination'
 export interface Localizacao {
   latitude: number
   longitude: number
-  precisao?: number
+  precisao: number
+  /** ISO 8601 */
+  timestamp: string
 }
 
 export interface Chamado {
-  id: string
+  id: number
   tipo: string
   status: string
   descricao?: string
@@ -17,7 +19,7 @@ export interface Chamado {
 }
 
 export interface AbrirChamadoPayload {
-  tipo: string
+  tipo?: string
   descricao?: string
   localizacao?: Localizacao
 }

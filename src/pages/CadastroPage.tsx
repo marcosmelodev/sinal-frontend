@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from 'react-router-dom'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
+import logo from '../assets/logo.svg'
 import { AuthService } from '../features/auth/AuthService'
 import { cadastroSchema } from '../features/auth/schemas'
 import type { CadastroFormData } from '../features/auth/schemas'
@@ -34,6 +35,7 @@ function CadastroPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-4">
+      <img src={logo} alt="Sinal de Ajudar em LIBRAS" className="mx-auto mb-6 h-24 w-24" />
       <h1 className="mb-6 text-3xl font-bold text-gray-900">Criar conta</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-2">

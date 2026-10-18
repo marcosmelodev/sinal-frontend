@@ -18,6 +18,13 @@ axiosClient.interceptors.request.use((config) => {
 axiosClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<Partial<ProblemDetails>>) => {
+    // Sessão expirada. O 401 do próprio login (credenciais inválidas) é tratado pela tela.
+    const isLoginRequest = error.config?.url?.endsWith('/auth/login')
+    if (error.response?.status === 401 && !isLoginRequest) {
+      localStorage.removeItem(ACCESS_TOKEN_KEY)
+      window.location.href = '/login'
+    }
+
     const data = error.response?.data
 
     if (data && typeof data.status === 'number') {

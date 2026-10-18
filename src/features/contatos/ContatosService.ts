@@ -1,7 +1,7 @@
 import axiosClient from '../../api/axiosClient'
 
 export interface Contato {
-  id: string
+  id: number
   nome: string
   telefone: string
   parentesco?: string
@@ -21,12 +21,12 @@ async function adicionar(contato: ContatoPayload): Promise<Contato> {
   return data
 }
 
-async function editar(id: string, contato: ContatoPayload): Promise<Contato> {
+async function editar(id: number, contato: ContatoPayload): Promise<Contato> {
   const { data } = await axiosClient.put<Contato>(`${BASE_URL}/${id}`, contato)
   return data
 }
 
-async function remover(id: string): Promise<void> {
+async function remover(id: number): Promise<void> {
   await axiosClient.delete(`${BASE_URL}/${id}`)
 }
 
