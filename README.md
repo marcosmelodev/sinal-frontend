@@ -75,7 +75,19 @@ Este repositório contém apenas o **front-end web**. A API REST (Spring Boot) f
 ### Contatos de confiança
 
 - **CRUD completo** integrado à API (`/api/v1/contatos-confianca`): listar, adicionar, editar e remover, com confirmação na própria lista.
-- **Modal de aviso rápido** ("Avisar contato") na tela inicial para escolher um contato e escrever uma mensagem. *O compartilhamento nativo ainda é simulado.*
+- **Compartilhamento real via deep links nativos** pelo modal "Avisar contato" da tela inicial:
+  1. O usuário escolhe o contato (telefone exibido como `(DD) 9XXXX-XXXX`) e, se quiser, escreve uma mensagem. Em branco, usa *"Preciso de ajuda!"*.
+  2. A localização é capturada ao abrir o modal e anexada como link dinâmico do **Google Maps** (`https://maps.google.com/?q=LAT,LONG`). Se o GPS falhar ou a permissão for negada, o usuário é avisado e a mensagem **segue apenas com o texto**, para nunca bloquear um pedido de ajuda.
+  3. Uma gaveta inferior **"Compartilhar via..."** oferece os canais abaixo.
+
+  | Canal | Link acionado | Observação |
+  | --- | --- | --- |
+  | **SMS** | `sms:TELEFONE?body=MENSAGEM` | Abre o app de mensagens do aparelho |
+  | **WhatsApp** | `https://wa.me/55TELEFONE?text=MENSAGEM` | DDI `55` adicionado a números de 10/11 dígitos; abre em nova aba segura (`noopener,noreferrer`) |
+  | **Telegram** | `https://t.me/share/url?url=LOCALIZACAO&text=MENSAGEM` | Sem localização, o próprio texto vai em `url` |
+
+  - O telefone é higienizado (só dígitos) e validado antes de abrir a gaveta. Contato ausente ou telefone inválido geram um erro acessível (`role="alert"`) no próprio modal.
+  - Toda a lógica de montagem de mensagem e links fica em funções puras, em `features/contatos/compartilhamento.ts`.
 
 ### Perfil
 
@@ -95,13 +107,13 @@ src/
 ├── assets/       # Logotipo oficial (original e versão otimizada)
 ├── components/   # Componentes reutilizáveis
 │   ├── chamados/ #   overlay de envio, cabeçalho do órgão, linhas de resumo
-│   ├── contatos/ #   modal "Avisar contato"
+│   ├── contatos/ #   modal "Avisar contato" e gaveta "Compartilhar via..."
 │   ├── layout/   #   menu inferior e layout das telas de entrada
 │   └── ui/       #   Input, Button e logotipo acessíveis
 ├── features/     # Módulos de domínio: services, schemas Zod, dados e formulários
 │   ├── auth/     #   login, cadastro e sessão por usuário
 │   ├── chamados/ #   contrato da API, órgãos, ocorrências, status, ícones
-│   ├── contatos/ #   CRUD e formulário de contato
+│   ├── contatos/ #   CRUD, formulário e deep links de compartilhamento
 │   └── perfil/   #   meus dados e alteração de senha
 ├── hooks/        # Estado e regras de uso: useChamados, useContatos, useOcorrencias
 ├── pages/        # Uma tela por rota
@@ -146,7 +158,11 @@ src/
   | Verde | Contatos | `#047857` |
 
 - **Alvos de toque amplos:** botões principais com no mínimo 48–56 px de altura. Os cards de órgão são grandes e quadrados.
-- **Navegação por teclado:** anel de foco visível em todos os controles, diálogos com foco inicial e fechamento por `Esc`, e menu inferior com `aria-current`.
+- **Navegação por teclado:**
+  - anel de foco visível em todos os controles;
+  - diálogos com foco inicial e fechamento por `Esc`. Na gaveta de compartilhamento, o `Esc` fecha só a gaveta;
+  - o modal de trás fica `inert` enquanto a gaveta está aberta, e o foco volta ao botão de origem ao fechar;
+  - menu inferior com `aria-current`.
 - **Leitores de tela:**
   - regiões `aria-live` anunciam erros, carregamentos e mudanças de status do chamado;
   - os campos têm `label` associado, com `aria-invalid` e `aria-errormessage`;
@@ -208,7 +224,7 @@ npm run preview   # serve localmente o build de produção
 
 - **Acompanhamento:** o back-end não expõe `GET /api/v1/chamados/{id}`. O acompanhamento localiza o chamado no histórico, percorrendo até 5 páginas de 20 itens.
 - **Perfil:** não há endpoints de perfil nem de troca de senha. A edição de dados é local e a troca de senha é simulada.
-- **Compartilhamento com contato:** o compartilhamento nativo (SMS/WhatsApp) ainda não está implementado.
+- **Compartilhamento com contato:** os deep links apenas preparam a mensagem e o envio é confirmado pelo usuário no app escolhido. O link de compartilhamento do Telegram não aceita telefone, então o usuário escolhe a conversa no próprio Telegram.
 - **IDs do catálogo local:** os IDs do fallback correspondem a um banco recém-migrado. Em uso normal, o catálogo vem da API.
 
 ---
