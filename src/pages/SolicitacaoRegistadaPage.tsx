@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { AlertTriangle, Check } from 'lucide-react'
 import Button from '../components/ui/Button'
+import AtendimentoLibrasAcesso from '../components/chamados/AtendimentoLibrasAcesso'
 import LinhaResumo from '../components/chamados/LinhaResumo'
 import type { Chamado, Localizacao } from '../features/chamados/ChamadosService'
 import { buscarOcorrencia } from '../features/chamados/ocorrenciasData'
 import { isTipoChamado, orgaoDoTipo } from '../features/chamados/orgaos'
-import { codigoSimulacao } from '../features/chamados/status'
+import { codigoSimulacao, isEncerrado } from '../features/chamados/status'
 import { useChamados } from '../hooks/useChamados'
 import { formatarCoordenadas, formatarData, parseId } from '../utils/formatters'
 import { mensagemDeErro } from '../utils/problemDetails'
@@ -89,6 +90,13 @@ function SolicitacaoRegistadaPage() {
             <LinhaResumo rotulo="Código da simulação" valor={codigoSimulacao(chamado)} />
           </dl>
         </section>
+      )}
+
+      {chamado && orgao && (
+        <AtendimentoLibrasAcesso
+          nomeOrgao={orgao.nomeCompleto}
+          disponivel={!isEncerrado(chamado.estado)}
+        />
       )}
 
       <div className="mt-auto flex w-full flex-col gap-1">

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { AlertTriangle, Check, Info } from 'lucide-react'
 import Button from '../components/ui/Button'
+import AtendimentoLibrasAcesso from '../components/chamados/AtendimentoLibrasAcesso'
 import LinhaResumo from '../components/chamados/LinhaResumo'
 import type { Chamado } from '../features/chamados/ChamadosService'
 import { orgaoDoTipo } from '../features/chamados/orgaos'
@@ -137,6 +138,9 @@ function AcompanhamentoChamadoPage() {
                 })}
               </ol>
             </section>
+
+            {/* Videochamada só para chamados ativos (CRIADO / ENCAMINHADO_SIMULADO) */}
+            <AtendimentoLibrasAcesso nomeOrgao={orgao.nomeCompleto} disponivel={!encerrado} />
 
             <section className="rounded-2xl bg-white p-4 text-slate-900">
               <h2 className="sr-only">Resumo</h2>

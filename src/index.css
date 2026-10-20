@@ -13,3 +13,44 @@
     background-color: #121933;
   }
 }
+
+/*
+ * Animações do intérprete simulado da videochamada em LIBRAS.
+ * Ficam aqui (e não no tailwind.config) para recarregarem sem reiniciar o dev server.
+ */
+@layer components {
+  .libras-mao-esq {
+    transform-origin: 70px 150px;
+    animation: libras-sinal-esq 2.4s ease-in-out infinite;
+  }
+  .libras-mao-dir {
+    transform-origin: 170px 150px;
+    animation: libras-sinal-dir 2.4s ease-in-out infinite;
+  }
+  .libras-onda {
+    animation: libras-onda 2.4s ease-out infinite;
+  }
+
+  @keyframes libras-sinal-esq {
+    0%, 100% { transform: rotate(0deg) translate(0, 0); }
+    30% { transform: rotate(-18deg) translate(-4px, -10px); }
+    60% { transform: rotate(10deg) translate(6px, -4px); }
+  }
+  @keyframes libras-sinal-dir {
+    0%, 100% { transform: rotate(0deg) translate(0, 0); }
+    25% { transform: rotate(16deg) translate(4px, -12px); }
+    65% { transform: rotate(-12deg) translate(-6px, -2px); }
+  }
+  @keyframes libras-onda {
+    0% { transform: scale(0.85); opacity: 0.55; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .libras-mao-esq,
+    .libras-mao-dir,
+    .libras-onda {
+      animation: none;
+    }
+  }
+}
