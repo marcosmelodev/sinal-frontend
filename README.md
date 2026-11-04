@@ -2,7 +2,8 @@
 
 # Projeto S.I.N.A.L.
 
-🚀 **Acesso ao sistema em produção (MVP):** [Clique aqui para aceder](https://sinal-frontend.onrender.com)
+🚀 **Acesso ao sistema em produção (MVP):** [Clique aqui para acessar](https://sinal-frontend.onrender.com)
+
 **Sistema de Acionamento de Emergência Acessível para a Comunidade Surda** — Protótipo Acadêmico
 
 O SINAL oferece um fluxo **visual, rápido e sem dependência de chamadas de voz** para acionar órgãos de segurança e socorro (**Polícia Militar**, **SAMU** e **Corpo de Bombeiros**) ou alertar contatos de confiança. Toda a interação acontece por toques e leitura: sem ligação, sem áudio.
